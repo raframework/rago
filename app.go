@@ -1,9 +1,16 @@
 package rago
 
 import (
-	"log"
 	"net/http"
+
+	"github.com/raframework/rago/log"
 )
+
+var Logger = log.NewRaLogger()
+
+func init() {
+	Logger.WithLevel(log.LevelDebug)
+}
 
 type RequestHandler func(*Context)
 
@@ -13,12 +20,14 @@ type app struct {
 }
 
 func NewApp(uriPatterns map[UriPattern]ResourceMethod) *app {
+	Logger.Debug("rago: NewApp")
 	return &app{
 		uriPatterns: uriPatterns,
 	}
 }
 
 func (a *app) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	Logger.Debug("rago: app.ServeHTTP")
 	context := NewContext(a.uriPatterns)
 
 	a.requestHandler(context)
@@ -31,5 +40,6 @@ func (a *app) WithRequestHanlder(requestHandler RequestHandler) *app {
 }
 
 func (a *app) Run(address string) {
-	log.Fatal(http.ListenAndServe(address, a))
+	Logger.Debug("rago: app.Run")
+	http.ListenAndServe(address, a)
 }

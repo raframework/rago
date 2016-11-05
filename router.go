@@ -11,6 +11,8 @@ type router struct {
 }
 
 func newRouter(request *http.Request, response *http.Response, uriPatterns map[UriPattern]ResourceMethod) *router {
+	Logger.Debug("rago: NewRouter")
+
 	return &router{
 		request:     request,
 		response:    response,
@@ -19,9 +21,9 @@ func newRouter(request *http.Request, response *http.Response, uriPatterns map[U
 }
 
 func (r *router) match() {
-
+	Logger.Debug("rago: router.match")
 }
 
 func (r *router) callResourceAction() {
-
+	Logger.Debug("rago: router.callResourceAction")
 }
