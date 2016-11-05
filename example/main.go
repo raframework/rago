@@ -8,5 +8,12 @@ import (
 func main() {
 	app := rago.NewApp(config.UriPatterns)
 
-	app.MatchUriPattern().CallResourceAction().Respond()
+	requestHandler := func(c *rago.Context) {
+		c.MatchUriPattern()
+		c.Call()
+		c.CallResourceAction()
+		c.Respond()
+	}
+
+	app.WithRequestHanlder(requestHandler).Run(":8800")
 }

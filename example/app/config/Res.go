@@ -6,13 +6,13 @@ import (
 	"github.com/raframework/rago/example/app/resource/users"
 )
 
-var UriPatterns = map[rago.UriPattern]rago.ResourceMethod{
+var UriPatterns = rago.UriPatterns{
 	"/users": {
-		Resource: &resource.Users{},
-		Methods:  {"POST", "GET", "PUT", "DELETE"},
+		&resource.Users{},
+		{"POST", "GET", "PUT", "DELETE"},
 	},
 	"/users/:id/password": {
-		Resource: &users.Password{},
-		Methods:  {"PUT"},
+		&users.Password{},
+		{"PUT"},
 	},
 }

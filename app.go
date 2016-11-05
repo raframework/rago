@@ -1,43 +1,32 @@
 package rago
 
 import (
-	"github.com/raframework/rago/http"
+	"net/http"
 )
 
 type app struct {
-	request  *http.Request
-	response *http.Response
-	router   *router
+	uriPatterns    UriPatterns
+	requestHandler RequestHandler
 }
 
-func NewApp(uriPatterns map[UriPattern]ResourceMethod) *app {
-	request := http.NewRequest()
-	response := http.NewResponse()
-	router := newRouter(request, response, uriPatterns)
-
+func NewApp(uriPatterns UriPatterns) *app {
 	return &app{
-		request:  request,
-		response: response,
-		router:   router,
+		uriPatterns: uriPatterns,
 	}
 }
 
-func (a *app) MatchUriPattern() *app {
-	a.router.match()
+func (a *app) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	context := NewContext(a.uriPatterns)
+
+	a.requestHandler(context)
+}
+
+func (a *app) WithRequestHanlder(requestHandler func(*Context)) *app {
+	a.requestHandler = requestHandler
 
 	return a
 }
 
-func (a *app) CallResourceAction() *app {
-	a.router.callResourceAction()
-
-	return a
-}
-
-func (a *app) Call() *app {
-	return a
-}
-
-func (a *app) Respond() *app {
-	return a
+func (a *app) Run(address string) {
+	http.ListenAndServe(address, a)
 }

@@ -12,8 +12,8 @@ type router struct {
 
 func newRouter(request *http.Request, response *http.Response, uriPatterns map[UriPattern]ResourceMethod) *router {
 	return &router{
-		request:     http.NewRequest(),
-		response:    http.NewResponse(),
+		request:     request,
+		response:    response,
 		uriPatterns: uriPatterns,
 	}
 }
