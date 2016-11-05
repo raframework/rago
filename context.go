@@ -10,10 +10,12 @@ type Context struct {
 	router   *router
 }
 
-func NewContext(uriPatterns UriPatterns) *Context {
+func NewContext(uriPatterns map[UriPattern]ResourceMethod) *Context {
+	request := http.NewRequest()
+	response := http.NewResponse()
 	return &Context{
-		request:  http.NewRequest(),
-		response: http.NewResponse(),
+		request:  request,
+		response: response,
 		router:   newRouter(request, response, uriPatterns),
 	}
 }

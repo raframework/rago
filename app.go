@@ -1,15 +1,18 @@
 package rago
 
 import (
+	"log"
 	"net/http"
 )
 
+type RequestHandler func(*Context)
+
 type app struct {
-	uriPatterns    UriPatterns
+	uriPatterns    map[UriPattern]ResourceMethod
 	requestHandler RequestHandler
 }
 
-func NewApp(uriPatterns UriPatterns) *app {
+func NewApp(uriPatterns map[UriPattern]ResourceMethod) *app {
 	return &app{
 		uriPatterns: uriPatterns,
 	}
@@ -21,12 +24,12 @@ func (a *app) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	a.requestHandler(context)
 }
 
-func (a *app) WithRequestHanlder(requestHandler func(*Context)) *app {
+func (a *app) WithRequestHanlder(requestHandler RequestHandler) *app {
 	a.requestHandler = requestHandler
 
 	return a
 }
 
 func (a *app) Run(address string) {
-	http.ListenAndServe(address, a)
+	log.Fatal(http.ListenAndServe(address, a))
 }
