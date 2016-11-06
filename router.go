@@ -1,18 +1,32 @@
 package rago
 
 import (
-	"github.com/raframework/rago/http"
-	"github.com/raframework/rago/log"
+	"reflect"
+	"strings"
+
+	"github.com/raframework/rago/raerror"
+	"github.com/raframework/rago/rahttp"
+	"github.com/raframework/rago/ralog"
 )
 
-type router struct {
-	request     *http.Request
-	response    *http.Response
-	uriPatterns map[UriPattern]ResourceMethod
+const ACTION_OF_LIST = "List"
+
+var methodActionMap = map[rahttp.Method]string{
+	rahttp.METHOD_GET:    "Get",
+	rahttp.METHOD_POST:   "Create",
+	rahttp.METHOD_PUT:    "Update",
+	rahttp.METHOD_DELETE: "Delete",
 }
 
-func newRouter(request *http.Request, response *http.Response, uriPatterns map[UriPattern]ResourceMethod) *router {
-	log.Debug("rago: NewRouter")
+type router struct {
+	request        *rahttp.Request
+	response       *rahttp.Response
+	uriPatterns    map[rahttp.UriPattern]rahttp.ResourceMethod
+	resourceAction reflect.Value
+}
+
+func newRouter(request *rahttp.Request, response *rahttp.Response, uriPatterns map[rahttp.UriPattern]rahttp.ResourceMethod) *router {
+	ralog.Debug("rago: NewRouter")
 
 	return &router{
 		request:     request,
@@ -22,9 +36,92 @@ func newRouter(request *http.Request, response *http.Response, uriPatterns map[U
 }
 
 func (r *router) match() {
-	log.Debug("rago: router.match")
+	path := strings.TrimSpace(r.request.GetUriPath())
+
+	pathSegments := strings.Split(strings.Trim(path, "/"), "/")
+	ralog.Debug("rago: pathSegments ", pathSegments)
+	pathSegmentCount := len(pathSegments)
+	ralog.Debug("rago: pathSegmentCount ", pathSegmentCount)
+
+	args := make(map[string]string)
+
+	matched := false
+	for pattern, resourceMethod := range r.uriPatterns {
+		patternSegments := strings.Split(strings.Trim(string(pattern), "/"), "/")
+		ralog.Debug("rago: patternSegments ", patternSegments)
+		patternSegmentCount := len(patternSegments)
+		ralog.Debug("rago: patternSegmentCount ", patternSegmentCount)
+		if patternSegmentCount != pathSegmentCount {
+			continue
+		}
+
+		matched = true
+		for i := 0; i < patternSegmentCount; i++ {
+			if len(patternSegments[i]) > 0 && patternSegments[i][0] == ':' {
+				args[patternSegments[i][1:]] = pathSegments[i]
+			} else if patternSegments[i] != pathSegments[i] {
+				matched = false
+				break
+			}
+		}
+
+		if matched {
+			r.request.WithMatchedUriPattern(pattern)
+			r.request.WithAttributes(args)
+			method := r.request.GetMethod()
+			ralog.Debug("rago: method ", method)
+			if !isMethodSupported(method, resourceMethod.Methods) {
+				panic(raerror.NewMethodNotAllowedErrorf("rago: unsupported method %s", method))
+			}
+
+			lastSegmentIsAttribute := patternSegments[patternSegmentCount-1][0] == ':'
+			ralog.Debug("rago: lastSegmentIsAttribute ", lastSegmentIsAttribute)
+			r.withResourceObjAndAction(resourceMethod.Resource, method, lastSegmentIsAttribute)
+			break
+		}
+
+		if !matched {
+			panic(raerror.NewNotFoundError("rago: resource not found"))
+		}
+
+	}
+
+	ralog.Debug("rago: router.match")
+}
+
+func (r *router) withResourceObjAndAction(resourcePtr interface{}, method rahttp.Method, lastSegmentIsAttribute bool) {
+	resourcePtrType := reflect.TypeOf(resourcePtr)
+
+	actionName := methodActionMap[method]
+	if method == rahttp.METHOD_GET && !lastSegmentIsAttribute {
+		actionName = ACTION_OF_LIST
+	}
+	_, ok := resourcePtrType.MethodByName(actionName)
+	if !ok {
+		panic(raerror.NewRuntimeError("rago: resource action '" + actionName + "' not found"))
+	}
+
+	resourceType := resourcePtrType.Elem()
+	ralog.Debug("rago: resource type ", resourceType)
+
+	newResourcePtr := reflect.New(resourceType)
+	action := newResourcePtr.MethodByName(actionName)
+	ralog.Debug("rago: resource action ", action)
+	r.resourceAction = action
 }
 
 func (r *router) callResourceAction() {
-	log.Debug("rago: router.callResourceAction")
+	ralog.Debug("rago: router.callResourceAction")
+
+	r.resourceAction.Call([]reflect.Value{reflect.ValueOf(r.request), reflect.ValueOf(r.response)})
+}
+
+func isMethodSupported(method rahttp.Method, methods []rahttp.Method) bool {
+	for _, item := range methods {
+		if item == method {
+			return true
+		}
+	}
+
+	return false
 }

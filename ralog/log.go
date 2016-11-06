@@ -1,4 +1,4 @@
-package log
+package ralog
 
 import (
 	"fmt"

@@ -1,21 +1,25 @@
 package rago
 
 import (
-	"github.com/raframework/rago/http"
-	"github.com/raframework/rago/log"
+	"net/http"
+
+	"github.com/raframework/rago/rahttp"
+	"github.com/raframework/rago/ralog"
 )
 
 type Context struct {
-	request  *http.Request
-	response *http.Response
-	router   *router
+	request      *rahttp.Request
+	response     *rahttp.Response
+	router       *router
+	err          error
+	errorHandler func(interface{})
 }
 
-func NewContext(uriPatterns map[UriPattern]ResourceMethod) *Context {
-	log.Debug("rago: NewContext")
+func NewContext(uriPatterns map[rahttp.UriPattern]rahttp.ResourceMethod, w http.ResponseWriter, req *http.Request) *Context {
+	ralog.Debug("rago: NewContext")
 
-	request := http.NewRequest()
-	response := http.NewResponse()
+	request := rahttp.NewRequest(req)
+	response := rahttp.NewResponse(w)
 
 	return &Context{
 		request:  request,
@@ -24,8 +28,19 @@ func NewContext(uriPatterns map[UriPattern]ResourceMethod) *Context {
 	}
 }
 
+func (c *Context) recover() {
+	if err := recover(); err != nil {
+		c.errorHandler(err)
+	}
+}
+
 func (c *Context) MatchUriPattern() *Context {
-	log.Debug("rago: context.MatchUriPatter")
+	if c.err != nil {
+		return c
+	}
+	defer c.recover()
+
+	ralog.Debug("rago: context.MatchUriPatter")
 
 	c.router.match()
 
@@ -33,7 +48,12 @@ func (c *Context) MatchUriPattern() *Context {
 }
 
 func (c *Context) CallResourceAction() *Context {
-	log.Debug("rago: context.callResourceAction")
+	if c.err != nil {
+		return c
+	}
+	defer c.recover()
+
+	ralog.Debug("rago: context.callResourceAction")
 
 	c.router.callResourceAction()
 
@@ -41,13 +61,22 @@ func (c *Context) CallResourceAction() *Context {
 }
 
 func (c *Context) Call() *Context {
-	log.Debug("rago: context.Call")
+	if c.err != nil {
+		return c
+	}
+	defer c.recover()
+
+	ralog.Debug("rago: context.Call")
 
 	return c
 }
 
 func (c *Context) Respond() *Context {
-	log.Debug("rago: context.Respond")
+	ralog.Debug("rago: context.Respond")
 
 	return c
+}
+
+func (c *Context) WithErrorHandler(errorHandler func(interface{})) {
+	c.errorHandler = errorHandler
 }

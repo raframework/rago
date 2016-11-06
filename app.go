@@ -3,30 +3,31 @@ package rago
 import (
 	"net/http"
 
-	"github.com/raframework/rago/log"
+	"github.com/raframework/rago/rahttp"
+	"github.com/raframework/rago/ralog"
 )
 
 func init() {
-	log.SetLevel(log.LDebug)
+	ralog.SetLevel(ralog.LDebug)
 }
 
 type RequestHandler func(*Context)
 
 type app struct {
-	uriPatterns    map[UriPattern]ResourceMethod
+	uriPatterns    map[rahttp.UriPattern]rahttp.ResourceMethod
 	requestHandler RequestHandler
 }
 
-func NewApp(uriPatterns map[UriPattern]ResourceMethod) *app {
-	log.Debug("rago: NewApp")
+func NewApp(uriPatterns map[rahttp.UriPattern]rahttp.ResourceMethod) *app {
+	ralog.Debug("rago: NewApp")
 	return &app{
 		uriPatterns: uriPatterns,
 	}
 }
 
 func (a *app) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	log.Debug("rago: app.ServeHTTP")
-	context := NewContext(a.uriPatterns)
+	ralog.Debug("rago: app.ServeHTTP")
+	context := NewContext(a.uriPatterns, w, req)
 
 	a.requestHandler(context)
 }
@@ -38,6 +39,7 @@ func (a *app) WithRequestHanlder(requestHandler RequestHandler) *app {
 }
 
 func (a *app) Run(address string) {
-	log.Debug("rago: app.Run")
-	http.ListenAndServe(address, a)
+	ralog.Debug("rago: app.Run")
+
+	ralog.Critical(http.ListenAndServe(address, a))
 }
