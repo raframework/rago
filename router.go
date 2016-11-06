@@ -2,6 +2,7 @@ package rago
 
 import (
 	"github.com/raframework/rago/http"
+	"github.com/raframework/rago/log"
 )
 
 type router struct {
@@ -11,7 +12,7 @@ type router struct {
 }
 
 func newRouter(request *http.Request, response *http.Response, uriPatterns map[UriPattern]ResourceMethod) *router {
-	Logger.Debug("rago: NewRouter")
+	log.Debug("rago: NewRouter")
 
 	return &router{
 		request:     request,
@@ -21,9 +22,9 @@ func newRouter(request *http.Request, response *http.Response, uriPatterns map[U
 }
 
 func (r *router) match() {
-	Logger.Debug("rago: router.match")
+	log.Debug("rago: router.match")
 }
 
 func (r *router) callResourceAction() {
-	Logger.Debug("rago: router.callResourceAction")
+	log.Debug("rago: router.callResourceAction")
 }

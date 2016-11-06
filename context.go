@@ -2,6 +2,7 @@ package rago
 
 import (
 	"github.com/raframework/rago/http"
+	"github.com/raframework/rago/log"
 )
 
 type Context struct {
@@ -11,7 +12,7 @@ type Context struct {
 }
 
 func NewContext(uriPatterns map[UriPattern]ResourceMethod) *Context {
-	Logger.Debug("rago: NewContext")
+	log.Debug("rago: NewContext")
 
 	request := http.NewRequest()
 	response := http.NewResponse()
@@ -24,7 +25,7 @@ func NewContext(uriPatterns map[UriPattern]ResourceMethod) *Context {
 }
 
 func (c *Context) MatchUriPattern() *Context {
-	Logger.Debug("rago: context.MatchUriPatter")
+	log.Debug("rago: context.MatchUriPatter")
 
 	c.router.match()
 
@@ -32,7 +33,7 @@ func (c *Context) MatchUriPattern() *Context {
 }
 
 func (c *Context) CallResourceAction() *Context {
-	Logger.Debug("rago: context.callResourceAction")
+	log.Debug("rago: context.callResourceAction")
 
 	c.router.callResourceAction()
 
@@ -40,13 +41,13 @@ func (c *Context) CallResourceAction() *Context {
 }
 
 func (c *Context) Call() *Context {
-	Logger.Debug("rago: context.Call")
+	log.Debug("rago: context.Call")
 
 	return c
 }
 
 func (c *Context) Respond() *Context {
-	Logger.Debug("rago: context.Respond")
+	log.Debug("rago: context.Respond")
 
 	return c
 }
