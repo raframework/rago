@@ -3,6 +3,7 @@ package log
 import (
 	"fmt"
 	"io"
+	"time"
 )
 
 // Log levels in RFC5424
@@ -105,7 +106,8 @@ func (l *Logger) Output(s string) error {
 }
 
 func (l *Logger) addRecord(level LogLevel, v ...interface{}) {
+	now := time.Now().Format("2006-01-02 15:04:05")
 	if level <= l.level {
-		l.Output("[" + level.String() + "]" + fmt.Sprint(v...))
+		l.Output(now + " [" + level.String() + "] " + fmt.Sprint(v...))
 	}
 }

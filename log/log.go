@@ -12,81 +12,73 @@ func SetLevel(level LogLevel) {
 }
 
 func Emergency(v ...interface{}) {
-	s := fmt.Sprint(v...)
-	std.Output(s)
+	std.Emergency(v...)
 }
 
 func Alert(v ...interface{}) {
-	s := fmt.Sprint(v...)
-	std.Output(s)
+	std.Alert(v...)
 }
 
 func Critical(v ...interface{}) {
-	s := fmt.Sprint(v...)
-	std.Output(s)
+	std.Critical(v...)
 }
 
 func Error(v ...interface{}) {
-	s := fmt.Sprint(v...)
-	std.Output(s)
+	std.Error(v...)
 }
 
 func Warning(v ...interface{}) {
-	s := fmt.Sprint(v...)
-	std.Output(s)
+	std.Warning(v...)
 }
 
 func Notice(v ...interface{}) {
-	s := fmt.Sprint(v...)
-	std.Output(s)
+	std.Notice(v...)
 }
 
 func Informational(v ...interface{}) {
-	s := fmt.Sprint(v...)
-	std.Output(s)
+	std.Informational(v...)
 }
 
 func Debug(v ...interface{}) {
-	s := fmt.Sprint(v...)
-	std.Output(s)
+	std.Debug(v...)
 }
 
 func Emergencyf(format string, v ...interface{}) {
 	s := fmt.Sprintf(format, v...)
-	std.Output(s)
+	std.Emergency(s)
 }
 
 func Alertf(format string, v ...interface{}) {
 	s := fmt.Sprintf(format, v...)
-	std.Output(s)
+	std.Alert(s)
 }
 
 func Criticalf(format string, v ...interface{}) {
 	s := fmt.Sprintf(format, v...)
-	std.Output(s)
+	std.Critical(s)
 }
 
 func Errorf(format string, v ...interface{}) {
 	s := fmt.Sprintf(format, v...)
-	std.Output(s)
+	std.Error(s)
 }
 
 func Warningf(format string, v ...interface{}) {
 	s := fmt.Sprintf(format, v...)
-	std.Output(s)
+	std.Warning(s)
 }
 
 func Noticef(format string, v ...interface{}) {
 	s := fmt.Sprintf(format, v...)
-	std.Output(s)
+	std.Notice(s)
 }
 
 func Informationalf(format string, v ...interface{}) {
 	s := fmt.Sprintf(format, v...)
-	std.Output(s)
+	std.Informational(s)
 }
 
 func Debugf(format string, v ...interface{}) {
 	s := fmt.Sprintf(format, v...)
-	std.Output(s)
+	std.Debug(s)
 }
