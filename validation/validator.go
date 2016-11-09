@@ -4,28 +4,24 @@ import (
 	"strings"
 )
 
-var ruleMethodMap = map[string]func(string, interface{}, []string) bool{
-	"required": validateRequired,
-}
-
 type validator struct {
 	data    map[string]interface{}
 	rules   map[string][]string
 	message string
 }
 
-func NewValidator(data interface{}, rules map[string]interface{}, messages messages) *validator {
+func New(data map[string]interface{}, rules map[string]interface{}) *validator {
 	return &validator{
 		data:  data,
 		rules: explodeRules(rules),
 	}
 }
 
-func (v *validator) fails() bool {
+func (v *validator) Fails() bool {
 	return !v.passes()
 }
 
-func (v *validator) passes() bool {
+func (v *validator) Passes() bool {
 	for attribute, rules := range v.rules {
 		for _, rule := range rules {
 			if !v.validate(attribute, rule) {
@@ -37,7 +33,7 @@ func (v *validator) passes() bool {
 	return true
 }
 
-func (v *validator) getMessage() {
+func (v *validator) GetMessage() {
 	return v.message
 }
 
@@ -97,8 +93,4 @@ func parseParameters(rule, parameter string) []string {
 	}
 
 	return parameters
-}
-
-func validateRequired(attribute string, value interface{}, parameters []string) bool {
-
 }

@@ -36,3 +36,15 @@ func (r *Request) GetMethod() Method {
 func (r *Request) WithAttributes(attributes map[string]string) {
 	r.attributes = attributes
 }
+
+func (r *Request) GetParsedBody() map[string]interface{} {
+
+}
+
+func (r *Request) GetQueryParams() map[string]string {
+
+}
+
+func (r *Request) GetAttributes() map[string]string {
+
+}
