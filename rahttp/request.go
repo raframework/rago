@@ -16,6 +16,7 @@ type Request struct {
 	stdRequest        *http.Request
 	matchedUriPattern UriPattern
 	attributes        map[string]string
+	bodyParsed        map[string]interface{}
 }
 
 func NewRequest(stdRequest *http.Request) *Request {
@@ -58,10 +59,14 @@ func (r *Request) GetMediaType() string {
 }
 
 func (r *Request) GetParsedBody() map[string]interface{} {
-	parsedBody := make(map[string]interface{})
+	if r.bodyParsed != nil {
+		return r.bodyParsed
+	}
+
+	r.bodyParsed = make(map[string]interface{})
 
 	if r.stdRequest.Body == nil {
-		return parsedBody
+		return r.bodyParsed
 	}
 
 	mt := r.GetMediaType()
@@ -78,14 +83,14 @@ func (r *Request) GetParsedBody() map[string]interface{} {
 		if err != nil {
 			panic("Body should be a JSON object: " + err.Error())
 		}
-		parsedBody = formatJsonValue(v)
+		r.bodyParsed = formatJsonValue(v)
 
 	default:
 		r.stdRequest.ParseForm()
-		parsedBody = formatPostForm(r.stdRequest.PostForm)
+		r.bodyParsed = formatPostForm(r.stdRequest.PostForm)
 	}
 
-	return parsedBody
+	return r.bodyParsed
 }
 
 func formatPostForm(postForm url.Values) map[string]interface{} {
