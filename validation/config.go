@@ -1,6 +1,8 @@
 package validation
 
-var ruleMethodMap = map[string]func(string, interface{}, []string) bool{
+type ruleMethod func(string, interface{}, []string) bool
+
+var ruleMethodMap = map[string]ruleMethod{
 	"required": validateRequired,
 	"email":    validateEmail,
 }

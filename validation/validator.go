@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"errors"
 	"strings"
 )
 
@@ -17,8 +18,27 @@ func New(data map[string]interface{}, rules map[string]interface{}) *validator {
 	}
 }
 
+func explodeRules(rules map[string]interface{}) map[string][]string {
+	r := map[string][]string{}
+
+	for attribute, rule := range rules {
+		switch rule.(type) {
+		case string:
+			strRule, _ := rule.(string)
+			r[attribute] = strings.Split(strRule, "|")
+		case []string:
+			sliceRule, _ := rule.([]string)
+			r[attribute] = sliceRule
+		default:
+			panic("Invalid type of rule")
+		}
+	}
+
+	return r
+}
+
 func (v *validator) Fails() bool {
-	return !v.passes()
+	return !v.Passes()
 }
 
 func (v *validator) Passes() bool {
@@ -33,7 +53,7 @@ func (v *validator) Passes() bool {
 	return true
 }
 
-func (v *validator) GetMessage() {
+func (v *validator) GetMessage() string {
 	return v.message
 }
 
@@ -45,15 +65,18 @@ func (v *validator) validate(attribute, rule string) bool {
 		return true
 	}
 
-}
-
-func (v *validator) getValue(attribute string) interface{} {
-	value, ok := v.data[attribute]
-	if !ok {
-		return nil
+	method, err := getRuleMethod(rule)
+	if err != nil {
+		panic(err)
 	}
 
-	return value
+	// Call the rule method
+	if !method(attribute, value, parameters) {
+		v.message, _ = defaultMessages[rule]
+		return false
+	}
+
+	return false
 }
 
 func parseRule(rule string) (string, []string) {
@@ -67,21 +90,22 @@ func parseRule(rule string) (string, []string) {
 	return rule, parameters
 }
 
-func explodeRules(rules map[string]interface{}) map[string][]string {
-	r := map[string][]string{}
-
-	for attribute, rule := range rules {
-		switch rule.(type) {
-		case string:
-			r[attribute] = strings.Split(rule, "|")
-		case []string:
-			r[attribute] = rule
-		default:
-			panic("Invalid type of rule")
-		}
+func (v *validator) getValue(attribute string) interface{} {
+	value, ok := v.data[attribute]
+	if !ok {
+		return nil
 	}
 
-	return r
+	return value
+}
+
+func getRuleMethod(rule string) (ruleMethod, error) {
+	method, ok := ruleMethodMap[rule]
+	if !ok {
+		return nil, errors.New("rule '" + rule + "'method not found")
+	}
+
+	return method, nil
 }
 
 func parseParameters(rule, parameter string) []string {

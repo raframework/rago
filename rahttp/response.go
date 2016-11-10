@@ -14,7 +14,7 @@ func NewResponse(stdResponseWriter http.ResponseWriter) *Response {
 	}
 }
 
-func (r *Response) withStatus(code int) *Response {
+func (r *Response) WithStatus(code int) *Response {
 	return r
 }
 

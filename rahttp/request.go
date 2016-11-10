@@ -38,13 +38,13 @@ func (r *Request) WithAttributes(attributes map[string]string) {
 }
 
 func (r *Request) GetParsedBody() map[string]interface{} {
-
+	return nil
 }
 
 func (r *Request) GetQueryParams() map[string]string {
-
+	return nil
 }
 
 func (r *Request) GetAttributes() map[string]string {
-
+	return nil
 }
