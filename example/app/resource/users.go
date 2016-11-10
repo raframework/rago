@@ -19,6 +19,8 @@ func (u *Users) Create(request *rahttp.Request, response *rahttp.Response) {
 		"password": "required",
 	}
 
+	log.Println("example: parsedBody: ", parsedBody)
+
 	validator := validation.New(parsedBody, rules)
 	if validator.Fails() {
 		panic(validator.GetMessage())
