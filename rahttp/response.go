@@ -88,12 +88,12 @@ func NewResponse(stdResponseWriter http.ResponseWriter) *Response {
 	}
 }
 
-func (r *Response) GetProtocolVersion() {
+func (r *Response) GetProtocolVersion() string {
 	return r.protoclVersion
 }
 
 func (r *Response) GetStatusCode() int {
-	r.status
+	return r.status
 }
 
 func (r *Response) WithStatus(code int) *Response {
@@ -130,7 +130,10 @@ func (r *Response) GetHeaders() map[string]string {
 	return r.headers
 }
 
-func filterStatus(status int) {
+func (r *Response) WriteHeaders() {
+
+}
+func filterStatus(status int) int {
 	if status < 100 || status > 599 {
 		panic("Invalid HTTP status code")
 	}
