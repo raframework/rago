@@ -12,7 +12,7 @@ type Context struct {
 	response     *rahttp.Response
 	router       *router
 	err          error
-	errorHandler func(interface{})
+	errorHandler func(interface{}, *rahttp.Request, *rahttp.Response)
 }
 
 func NewContext(uriPatterns map[rahttp.UriPattern]rahttp.ResourceMethod, w http.ResponseWriter, req *http.Request) *Context {
@@ -30,7 +30,7 @@ func NewContext(uriPatterns map[rahttp.UriPattern]rahttp.ResourceMethod, w http.
 
 func (c *Context) recover() {
 	if err := recover(); err != nil {
-		c.errorHandler(err)
+		c.errorHandler(err, c.request, c.response)
 	}
 }
 
@@ -73,10 +73,13 @@ func (c *Context) Call() *Context {
 
 func (c *Context) Respond() *Context {
 	ralog.Debug("rago: context.Respond")
+	c.response.FlushStatus()
+	c.response.FlushHeaders()
+	c.response.FlushBody()
 
 	return c
 }
 
-func (c *Context) WithErrorHandler(errorHandler func(interface{})) {
+func (c *Context) WithErrorHandler(errorHandler func(interface{}, *rahttp.Request, *rahttp.Response)) {
 	c.errorHandler = errorHandler
 }

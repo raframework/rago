@@ -85,6 +85,7 @@ func NewResponse(stdResponseWriter http.ResponseWriter) *Response {
 	return &Response{
 		stdResponseWriter: stdResponseWriter,
 		protoclVersion:    "1.1",
+		headers:           map[string]string{},
 	}
 }
 
@@ -117,10 +118,6 @@ func (r *Response) Write(data string) *Response {
 }
 
 func (r *Response) withHeader(name, value string) *Response {
-	if r.headers == nil {
-		r.headers = make(map[string]string)
-	}
-
 	r.headers[name] = value
 
 	return r
@@ -130,9 +127,20 @@ func (r *Response) GetHeaders() map[string]string {
 	return r.headers
 }
 
-func (r *Response) WriteHeaders() {
-
+func (r *Response) FlushStatus() {
+	r.stdResponseWriter.WriteHeader(r.status)
 }
+
+func (r *Response) FlushHeaders() {
+	for name, value := range r.headers {
+		r.stdResponseWriter.Header().Set(name, value)
+	}
+}
+
+func (r *Response) FlushBody() {
+	r.stdResponseWriter.Write([]byte(r.body))
+}
+
 func filterStatus(status int) int {
 	if status < 100 || status > 599 {
 		panic("Invalid HTTP status code")

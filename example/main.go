@@ -5,11 +5,13 @@ import (
 
 	"github.com/raframework/rago"
 	"github.com/raframework/rago/example/app/config"
+	"github.com/raframework/rago/rahttp"
 )
 
-func errorHanlder(err interface{}) {
+func errorHanlder(err interface{}, request *rahttp.Request, response *rahttp.Response) {
 	log.Println("example: errorHandler with ", err)
-	panic(err)
+	response.WithStatus(500)
+	response.Write(`{"code": 10001, "message": "Internel Server Error"}`)
 }
 
 func main() {
