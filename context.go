@@ -3,6 +3,7 @@ package rago
 import (
 	"net/http"
 
+	"github.com/raframework/rago/raerror"
 	"github.com/raframework/rago/rahttp"
 	"github.com/raframework/rago/ralog"
 )
@@ -12,7 +13,7 @@ type Context struct {
 	response     *rahttp.Response
 	router       *router
 	err          error
-	errorHandler func(interface{}, *rahttp.Request, *rahttp.Response)
+	errorHandler raerror.ErrorHandler
 }
 
 func NewContext(uriPatterns map[rahttp.UriPattern]rahttp.ResourceMethod, w http.ResponseWriter, req *http.Request) *Context {
@@ -80,6 +81,6 @@ func (c *Context) Respond() *Context {
 	return c
 }
 
-func (c *Context) WithErrorHandler(errorHandler func(interface{}, *rahttp.Request, *rahttp.Response)) {
+func (c *Context) WithErrorHandler(errorHandler raerror.ErrorHandler) {
 	c.errorHandler = errorHandler
 }

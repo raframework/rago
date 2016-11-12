@@ -1,24 +1,16 @@
 package main
 
 import (
-	"log"
-
 	"github.com/raframework/rago"
-	"github.com/raframework/rago/example/app/config"
-	"github.com/raframework/rago/rahttp"
+	"github.com/raframework/rago/example/app/config/res"
+	"github.com/raframework/rago/example/app/lib/handler"
 )
 
-func errorHanlder(err interface{}, request *rahttp.Request, response *rahttp.Response) {
-	log.Println("example: errorHandler with ", err)
-	response.WithStatus(500)
-	response.Write(`{"code": 10001, "message": "Internel Server Error"}`)
-}
-
 func main() {
-	app := rago.NewApp(config.UriPatterns)
+	app := rago.NewApp(res.UriPatterns)
 
 	requestHandler := func(c *rago.Context) {
-		c.WithErrorHandler(errorHanlder)
+		c.WithErrorHandler(handler.ErrorHandler)
 		c.MatchUriPattern()
 		c.CallResourceAction()
 		c.Respond()

@@ -1,4 +1,4 @@
-package config
+package res
 
 import (
 	"github.com/raframework/rago/example/app/resource"
