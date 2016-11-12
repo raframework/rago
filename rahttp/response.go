@@ -117,7 +117,7 @@ func (r *Response) Write(data string) *Response {
 	return r
 }
 
-func (r *Response) withHeader(name, value string) *Response {
+func (r *Response) WithHeader(name, value string) *Response {
 	r.headers[name] = value
 
 	return r

@@ -75,8 +75,9 @@ func (c *Context) Call(p Processor) *Context {
 
 func (c *Context) Respond() *Context {
 	ralog.Debug("rago: context.Respond")
-	c.response.FlushStatus()
+
 	c.response.FlushHeaders()
+	c.response.FlushStatus()
 	c.response.FlushBody()
 
 	return c
