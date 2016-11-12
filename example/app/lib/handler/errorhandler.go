@@ -8,6 +8,7 @@ import (
 
 	"github.com/raframework/rago/example/app/config/code"
 	"github.com/raframework/rago/example/app/lib/apperror"
+	"github.com/raframework/rago/example/app/lib/rsp"
 	"github.com/raframework/rago/rahttp"
 )
 
@@ -26,6 +27,7 @@ func ErrorHandler(err interface{}, request *rahttp.Request, response *rahttp.Res
 	if ok {
 		statusCode := appError.Typ()
 		c := appError.Code()
+
 		var message string
 		message = appError.Message()
 		if message == "" {
@@ -33,8 +35,8 @@ func ErrorHandler(err interface{}, request *rahttp.Request, response *rahttp.Res
 		}
 
 		response.WithStatus(statusCode)
-		rsp, _ := json.Marshal(errorResponse{c, message, ""})
-		response.Write(string(rsp))
+
+		response.Write(rsp.Json(errorResponse{c, message, ""}))
 		return
 	}
 

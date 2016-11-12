@@ -4,6 +4,7 @@ import (
 	"github.com/raframework/rago"
 	"github.com/raframework/rago/example/app/config/res"
 	"github.com/raframework/rago/example/app/lib/handler"
+	"github.com/raframework/rago/example/app/processor"
 )
 
 func main() {
@@ -12,6 +13,7 @@ func main() {
 	requestHandler := func(c *rago.Context) {
 		c.WithErrorHandler(handler.ErrorHandler)
 		c.MatchUriPattern()
+		c.Call(&processor.Predo{})
 		c.CallResourceAction()
 		c.Respond()
 	}

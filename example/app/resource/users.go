@@ -5,6 +5,7 @@ import (
 
 	"github.com/raframework/rago/example/app/config/code"
 	"github.com/raframework/rago/example/app/lib/apperror"
+	"github.com/raframework/rago/example/app/lib/rsp"
 	"github.com/raframework/rago/rahttp"
 	"github.com/raframework/rago/validation"
 )
@@ -30,7 +31,15 @@ func (u *Users) Create(request *rahttp.Request, response *rahttp.Response) {
 
 	// TODO: do some register steps
 
-	response.WithStatus(201).Write(`{"id": 1, "email": "test@gmail.com"}`)
+	result := struct {
+		Id    int    `json:"id"`
+		Email string `json:"email"`
+	}{
+		1,
+		parsedBody["username"].(string),
+	}
+
+	response.WithStatus(201).Write(rsp.Json(result))
 }
 
 func (u *Users) Update(request *rahttp.Request, response *rahttp.Response) {

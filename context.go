@@ -61,13 +61,14 @@ func (c *Context) CallResourceAction() *Context {
 	return c
 }
 
-func (c *Context) Call() *Context {
+func (c *Context) Call(p Processor) *Context {
 	if c.err != nil {
 		return c
 	}
 	defer c.recover()
 
 	ralog.Debug("rago: context.Call")
+	p.Process(c.request, c.response)
 
 	return c
 }
