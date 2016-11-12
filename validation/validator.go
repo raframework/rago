@@ -76,7 +76,7 @@ func (v *validator) validate(attribute, rule string) bool {
 		return false
 	}
 
-	return false
+	return true
 }
 
 func parseRule(rule string) (string, []string) {
