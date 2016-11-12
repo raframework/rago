@@ -16,14 +16,16 @@ const (
 )
 
 type AppError struct {
-	typ  int
-	code int
+	typ     int
+	code    int
+	message string
 }
 
-func New(typ int, code int) error {
+func New(typ int, code int, message string) error {
 	return &AppError{
-		typ:  typ,
-		code: code,
+		typ:     typ,
+		code:    code,
+		message: message,
 	}
 }
 
@@ -39,6 +41,6 @@ func (ae *AppError) Code() int {
 	return ae.code
 }
 
-func PanicWith(typ int, code int) {
-	panic(New(typ, code))
+func (ae *AppError) Message() string {
+	return ae.message
 }

@@ -3,8 +3,8 @@ package resource
 import (
 	"log"
 
-	// "github.com/raframework/rago/example/app/config/code"
-	// "github.com/raframework/rago/example/app/lib/apperror"
+	"github.com/raframework/rago/example/app/config/code"
+	"github.com/raframework/rago/example/app/lib/apperror"
 	"github.com/raframework/rago/rahttp"
 	"github.com/raframework/rago/validation"
 )
@@ -25,7 +25,7 @@ func (u *Users) Create(request *rahttp.Request, response *rahttp.Response) {
 
 	validator := validation.New(parsedBody, rules)
 	if validator.Fails() {
-		panic(validator.GetMessage())
+		apperror.PanicWithMessage(apperror.BadRequest, code.ParamError, validator.GetMessage())
 	}
 
 	// TODO: do some register steps

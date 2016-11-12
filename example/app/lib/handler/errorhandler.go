@@ -12,9 +12,9 @@ import (
 )
 
 type errorResponse struct {
-	Code        int
-	Message     string
-	Description string
+	Code        int    `json:"code"`
+	Message     string `json:"message"`
+	Description string `json:"description"`
 }
 
 func ErrorHandler(err interface{}, request *rahttp.Request, response *rahttp.Response) {
@@ -26,7 +26,11 @@ func ErrorHandler(err interface{}, request *rahttp.Request, response *rahttp.Res
 	if ok {
 		statusCode := appError.Typ()
 		c := appError.Code()
-		message := code.Message(c)
+		var message string
+		message = appError.Message()
+		if message == "" {
+			message = code.Message(c)
+		}
 
 		response.WithStatus(statusCode)
 		rsp, _ := json.Marshal(errorResponse{c, message, ""})
