@@ -12,7 +12,7 @@ type Context struct {
 	request      *rahttp.Request
 	response     *rahttp.Response
 	router       *router
-	err          error
+	err          interface{}
 	errorHandler raerror.ErrorHandler
 }
 
@@ -31,6 +31,7 @@ func NewContext(uriPatterns map[rahttp.UriPattern]rahttp.ResourceMethod, w http.
 
 func (c *Context) recover() {
 	if err := recover(); err != nil {
+		c.err = err
 		c.errorHandler(err, c.request, c.response)
 	}
 }

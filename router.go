@@ -71,7 +71,7 @@ func (r *router) match() {
 			method := r.request.GetMethod()
 			ralog.Debug("rago: method ", method)
 			if !isMethodSupported(method, resourceMethod.Methods) {
-				panic(raerror.NewMethodNotAllowedErrorf("rago: unsupported method %s", method))
+				raerror.PanicWith(raerror.TypMethodNotAllowed, 0, "rago: unsupported method "+string(method))
 			}
 
 			lastSegmentIsAttribute := patternSegments[patternSegmentCount-1][0] == ':'
@@ -81,9 +81,8 @@ func (r *router) match() {
 		}
 
 		if !matched {
-			panic(raerror.NewNotFoundError("rago: resource not found"))
+			raerror.PanicWith(raerror.TypNotFound, 0, "rago: resource not found")
 		}
-
 	}
 
 	ralog.Debug("rago: router.match")
@@ -98,7 +97,7 @@ func (r *router) withResourceObjAndAction(resourcePtr interface{}, method rahttp
 	}
 	_, ok := resourcePtrType.MethodByName(actionName)
 	if !ok {
-		panic(raerror.NewRuntimeError("rago: resource action '" + actionName + "' not found"))
+		raerror.PanicWith(raerror.TypRuntime, 0, "rago: resource action '"+actionName+"' not found")
 	}
 
 	resourceType := resourcePtrType.Elem()

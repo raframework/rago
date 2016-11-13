@@ -12,8 +12,8 @@ func main() {
 
 	requestHandler := func(c *rago.Context) {
 		c.WithErrorHandler(handler.ErrorHandler)
-		c.MatchUriPattern()
 		c.Call(&processor.Predo{})
+		c.MatchUriPattern()
 		c.CallResourceAction()
 		c.Respond()
 	}

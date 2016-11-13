@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"reflect"
@@ -9,6 +8,7 @@ import (
 	"github.com/raframework/rago/example/app/config/code"
 	"github.com/raframework/rago/example/app/lib/apperror"
 	"github.com/raframework/rago/example/app/lib/rsp"
+	"github.com/raframework/rago/raerror"
 	"github.com/raframework/rago/rahttp"
 )
 
@@ -20,27 +20,71 @@ type errorResponse struct {
 
 func ErrorHandler(err interface{}, request *rahttp.Request, response *rahttp.Response) {
 
-	log.Println("err type: ", reflect.ValueOf(err).Type().Kind())
-	log.Println("example: errorHandler with ", err)
+	log.Println("example: err type: ", reflect.ValueOf(err).Type().Kind())
+	log.Println("example: errorHandler with err: ", err)
 
 	appError, ok := err.(*apperror.AppError)
 	if ok {
-		statusCode := appError.Typ()
-		c := appError.Code()
+		handleAppError(appError, request, response)
+		return
+	}
 
-		var message string
-		message = appError.Message()
-		if message == "" {
-			message = code.Message(c)
-		}
-
-		response.WithStatus(statusCode)
-
-		response.Write(rsp.Json(errorResponse{c, message, ""}))
+	raError, ok := err.(*raerror.RaError)
+	if ok {
+		handleRaError(raError, request, response)
 		return
 	}
 
 	response.WithStatus(500)
-	rsp, _ := json.Marshal(errorResponse{code.InternalServerError, fmt.Sprint("Internal server error with: ", err), ""})
-	response.Write(string(rsp))
+	response.Write(rsp.Json(errorResponse{code.InternalServerError, fmt.Sprint("Internal server error with: ", err), ""}))
+}
+
+func handleAppError(appError *apperror.AppError, request *rahttp.Request, response *rahttp.Response) {
+	statusCode := appError.Typ()
+	c := appError.Code()
+
+	var message string
+	message = appError.Message()
+	if message == "" {
+		message = code.Message(c)
+	}
+
+	response.WithStatus(statusCode)
+	response.Write(rsp.Json(errorResponse{c, message, ""}))
+}
+
+func handleRaError(raError *raerror.RaError, request *rahttp.Request, response *rahttp.Response) {
+	var c, statusCode int
+	var message string
+
+	switch raError.Typ() {
+	case raerror.TypMethodNotAllowed:
+		statusCode = 405
+		c = code.MethodNotAllowed
+
+	case raerror.TypNotFound:
+		statusCode = 404
+		c = code.ResourceNotFound
+
+	case raerror.TypBadBody:
+		statusCode = 400
+		c = code.BadBody
+		message = raError.Message()
+
+	case raerror.TypUnsupportedMediaType:
+		statusCode = 415
+		c = code.UnsupportedMediaType
+		message = raError.Message()
+
+	default:
+		statusCode = 500
+		c = code.InternalServerError
+	}
+
+	if message == "" {
+		message = code.Message(c)
+	}
+
+	response.WithStatus(statusCode)
+	response.Write(rsp.Json(errorResponse{c, message, ""}))
 }

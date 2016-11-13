@@ -4,84 +4,47 @@ import (
 	"fmt"
 )
 
-// ------------------------------------------------------------------
+const (
+	TypLogic           = 1
+	TypInvalidArgument = 2
+	TypRuntime         = 3
 
-type BadBodyError struct {
-	s string
+	TypNotFound             = 11
+	TypMethodNotAllowed     = 12
+	TypUnsupportedMediaType = 13
+	TypBadBody              = 14
+)
+
+type RaError struct {
+	typ     int
+	code    int
+	message string
 }
 
-func (b *BadBodyError) Error() string {
-	return b.s
+func New(typ int, code int, message string) error {
+	return &RaError{
+		typ:     typ,
+		code:    code,
+		message: message,
+	}
 }
 
-func NewBadBodyError(s string) *BadBodyError {
-	return &BadBodyError{s}
+func (re *RaError) Error() string {
+	return fmt.Sprintf("raerror type: %d, code: %d", re.typ, re.code)
 }
 
-// ------------------------------------------------------------------
-
-type MethodNotAllowedError struct {
-	s string
+func (re *RaError) Typ() int {
+	return re.typ
 }
 
-func (m *MethodNotAllowedError) Error() string {
-	return m.s
+func (re *RaError) Code() int {
+	return re.code
 }
 
-func NewMethodNotAllowedError(s string) *MethodNotAllowedError {
-	return &MethodNotAllowedError{s}
+func (re *RaError) Message() string {
+	return re.message
 }
 
-func NewMethodNotAllowedErrorf(format string, v ...interface{}) *MethodNotAllowedError {
-	return &MethodNotAllowedError{fmt.Sprintf(format, v...)}
-}
-
-// ------------------------------------------------------------------
-
-type NotFoundError struct {
-	s string
-}
-
-func (n *NotFoundError) Error() string {
-	return n.s
-}
-
-func NewNotFoundError(s string) *NotFoundError {
-	return &NotFoundError{s}
-}
-
-func NewNotFoundErrorf(format string, v ...interface{}) *NotFoundError {
-	return &NotFoundError{fmt.Sprintf(format, v...)}
-}
-
-// ------------------------------------------------------------------
-
-type UnsupportedMediaTypeError struct {
-	s string
-}
-
-func (u *UnsupportedMediaTypeError) Error() string {
-	return u.s
-}
-
-func NewUnsupportedMediaTypeError(s string) *UnsupportedMediaTypeError {
-	return &UnsupportedMediaTypeError{s}
-}
-
-// ------------------------------------------------------------------
-
-type RuntimeError struct {
-	s string
-}
-
-func (r *RuntimeError) Error() string {
-	return r.s
-}
-
-func NewRuntimeError(s string) *RuntimeError {
-	return &RuntimeError{s}
-}
-
-func NewRuntimeErrorf(format string, v ...interface{}) *RuntimeError {
-	return &RuntimeError{fmt.Sprintf(format, v...)}
+func PanicWith(typ int, code int, message string) {
+	panic(New(typ, code, message))
 }
