@@ -30,7 +30,7 @@ func New(typ int, code int, message string) error {
 }
 
 func (re *RaError) Error() string {
-	return fmt.Sprintf("raerror type: %d, code: %d", re.typ, re.code)
+	return fmt.Sprintf("raerror type: %d, code: %d, message: %s", re.typ, re.code, re.message)
 }
 
 func (re *RaError) Typ() int {

@@ -6,17 +6,17 @@ import (
 	"github.com/raframework/rago/rahttp"
 )
 
-var UriPatterns = map[rahttp.UriPattern]rahttp.ResourceMethod{
+var UriPatterns = map[rahttp.UriPattern]rahttp.ResourceAndMethod{
 	"/users": {
-		&resource.Users{},
+		resource.Users{},
 		[]rahttp.Method{"POST", "GET"},
 	},
 	"/users/:id": {
-		&resource.Users{},
+		resource.Users{},
 		[]rahttp.Method{"GET", "PUT", "DELETE"},
 	},
 	"/users/:id/password": {
-		&users.Password{},
+		users.Password{},
 		[]rahttp.Method{"PUT"},
 	},
 }

@@ -21,11 +21,11 @@ var methodActionMap = map[rahttp.Method]string{
 type router struct {
 	request        *rahttp.Request
 	response       *rahttp.Response
-	uriPatterns    map[rahttp.UriPattern]rahttp.ResourceMethod
+	uriPatterns    map[rahttp.UriPattern]rahttp.ResourceAndMethod
 	resourceAction reflect.Value
 }
 
-func newRouter(request *rahttp.Request, response *rahttp.Response, uriPatterns map[rahttp.UriPattern]rahttp.ResourceMethod) *router {
+func newRouter(request *rahttp.Request, response *rahttp.Response, uriPatterns map[rahttp.UriPattern]rahttp.ResourceAndMethod) *router {
 	ralog.Debug("rago: NewRouter")
 
 	return &router{
@@ -46,7 +46,7 @@ func (r *router) match() {
 	args := make(map[string]string)
 
 	matched := false
-	for pattern, resourceMethod := range r.uriPatterns {
+	for pattern, resourceAndMethod := range r.uriPatterns {
 		patternSegments := strings.Split(strings.Trim(string(pattern), "/"), "/")
 		ralog.Debug("rago: patternSegments ", patternSegments)
 		patternSegmentCount := len(patternSegments)
@@ -70,13 +70,13 @@ func (r *router) match() {
 			r.request.WithAttributes(args)
 			method := r.request.GetMethod()
 			ralog.Debug("rago: method ", method)
-			if !isMethodSupported(method, resourceMethod.Methods) {
+			if !isMethodSupported(method, resourceAndMethod.Methods) {
 				raerror.PanicWith(raerror.TypMethodNotAllowed, 0, "rago: unsupported method "+string(method))
 			}
 
 			lastSegmentIsAttribute := patternSegments[patternSegmentCount-1][0] == ':'
 			ralog.Debug("rago: lastSegmentIsAttribute ", lastSegmentIsAttribute)
-			r.withResourceObjAndAction(resourceMethod.Resource, method, lastSegmentIsAttribute)
+			r.withResourceAction(resourceAndMethod.ResourceObj, method, lastSegmentIsAttribute)
 			break
 		}
 
@@ -88,24 +88,37 @@ func (r *router) match() {
 	ralog.Debug("rago: router.match")
 }
 
-func (r *router) withResourceObjAndAction(resourcePtr interface{}, method rahttp.Method, lastSegmentIsAttribute bool) {
-	resourcePtrType := reflect.TypeOf(resourcePtr)
+func (r *router) withResourceAction(resourceObj interface{}, method rahttp.Method, lastSegmentIsAttribute bool) {
+	resourceType := reflect.TypeOf(resourceObj)
 
 	actionName := methodActionMap[method]
 	if method == rahttp.METHOD_GET && !lastSegmentIsAttribute {
 		actionName = ACTION_OF_LIST
 	}
-	_, ok := resourcePtrType.MethodByName(actionName)
-	if !ok {
+	resourcePtr := reflect.New(resourceType)
+	action := resourcePtr.MethodByName(actionName)
+	emtpyValue := reflect.Value{}
+	if action == emtpyValue {
 		raerror.PanicWith(raerror.TypRuntime, 0, "rago: resource action '"+actionName+"' not found")
 	}
+	ralog.Debug("rago: action ", action)
 
-	resourceType := resourcePtrType.Elem()
-	ralog.Debug("rago: resource type ", resourceType)
+	// _, ok := resourcePtr.Type().MethodByName(actionName)
+	// if !ok {
+	// 	raerror.PanicWith(raerror.TypRuntime, 0, "rago: resource action '"+actionName+"' not found")
+	// }
 
-	newResourcePtr := reflect.New(resourceType)
-	action := newResourcePtr.MethodByName(actionName)
-	ralog.Debug("rago: resource action ", action)
+	// _, ok := resourcePtrType.MethodByName(actionName)
+	// if !ok {
+	// 	raerror.PanicWith(raerror.TypRuntime, 0, "rago: resource action '"+actionName+"' not found")
+	// }
+
+	// resourceType := resourcePtrType.Elem()
+	// ralog.Debug("rago: resource type ", resourceType)
+
+	// newResourcePtr := reflect.New(resourceType)
+	// action := newResourcePtr.MethodByName(actionName)
+	// ralog.Debug("rago: resource action ", action)
 	r.resourceAction = action
 }
 

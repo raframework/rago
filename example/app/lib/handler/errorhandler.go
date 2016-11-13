@@ -85,6 +85,8 @@ func handleRaError(raError *raerror.RaError, request *rahttp.Request, response *
 		message = code.Message(c)
 	}
 
+	log.Println("example: error: ", raError)
+
 	response.WithStatus(statusCode)
 	response.Write(rsp.Json(errorResponse{c, message, ""}))
 }

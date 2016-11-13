@@ -11,7 +11,7 @@ type UriPattern string
 
 type Method string
 
-type ResourceMethod struct {
-	Resource interface{}
-	Methods  []Method
+type ResourceAndMethod struct {
+	ResourceObj interface{}
+	Methods     []Method
 }

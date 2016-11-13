@@ -16,7 +16,7 @@ type Context struct {
 	errorHandler raerror.ErrorHandler
 }
 
-func NewContext(uriPatterns map[rahttp.UriPattern]rahttp.ResourceMethod, w http.ResponseWriter, req *http.Request) *Context {
+func NewContext(uriPatterns map[rahttp.UriPattern]rahttp.ResourceAndMethod, w http.ResponseWriter, req *http.Request) *Context {
 	ralog.Debug("rago: NewContext")
 
 	request := rahttp.NewRequest(req)

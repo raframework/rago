@@ -14,11 +14,11 @@ func init() {
 type RequestHandler func(*Context)
 
 type app struct {
-	uriPatterns    map[rahttp.UriPattern]rahttp.ResourceMethod
+	uriPatterns    map[rahttp.UriPattern]rahttp.ResourceAndMethod
 	requestHandler RequestHandler
 }
 
-func NewApp(uriPatterns map[rahttp.UriPattern]rahttp.ResourceMethod) *app {
+func NewApp(uriPatterns map[rahttp.UriPattern]rahttp.ResourceAndMethod) *app {
 	ralog.Debug("rago: NewApp")
 	return &app{
 		uriPatterns: uriPatterns,
