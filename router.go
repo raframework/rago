@@ -103,22 +103,6 @@ func (r *router) withResourceAction(resourceObj interface{}, method rahttp.Metho
 	}
 	ralog.Debug("rago: action ", action)
 
-	// _, ok := resourcePtr.Type().MethodByName(actionName)
-	// if !ok {
-	// 	raerror.PanicWith(raerror.TypRuntime, 0, "rago: resource action '"+actionName+"' not found")
-	// }
-
-	// _, ok := resourcePtrType.MethodByName(actionName)
-	// if !ok {
-	// 	raerror.PanicWith(raerror.TypRuntime, 0, "rago: resource action '"+actionName+"' not found")
-	// }
-
-	// resourceType := resourcePtrType.Elem()
-	// ralog.Debug("rago: resource type ", resourceType)
-
-	// newResourcePtr := reflect.New(resourceType)
-	// action := newResourcePtr.MethodByName(actionName)
-	// ralog.Debug("rago: resource action ", action)
 	r.resourceAction = action
 }
 
