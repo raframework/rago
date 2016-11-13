@@ -79,10 +79,10 @@ func (r *router) match() {
 			r.withResourceAction(resourceAndMethod.ResourceObj, method, lastSegmentIsAttribute)
 			break
 		}
+	}
 
-		if !matched {
-			raerror.PanicWith(raerror.TypNotFound, 0, "rago: resource not found")
-		}
+	if !matched {
+		raerror.PanicWith(raerror.TypNotFound, 0, "rago: resource not found")
 	}
 
 	ralog.Debug("rago: router.match")
