@@ -1,4 +1,4 @@
-package raerror
+package rago
 
 import (
 	"github.com/raframework/rago/rahttp"

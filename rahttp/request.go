@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"regexp"
 
+	"github.com/raframework/rago/raerror"
 	"github.com/raframework/rago/ralog"
 )
 
@@ -50,12 +50,15 @@ func (r *Request) GetContentType() string {
 
 func (r *Request) GetMediaType() string {
 	ct := r.GetContentType()
+	ralog.Debug("rahttp: Content-Type: ", ct)
 	if ct == "" {
 		return ""
 	}
-	s := regexp.MustCompile("/\\s*[;,]\\s*/").Split(ct, 2)
+	s := regexp.MustCompile("\\s*[;,]\\s*").Split(ct, 2)
+	mediaType := s[0]
+	ralog.Debug("rahttp: mediaType: ", mediaType)
 
-	return s[0]
+	return mediaType
 }
 
 func (r *Request) GetParsedBody() map[string]interface{} {
@@ -75,18 +78,25 @@ func (r *Request) GetParsedBody() map[string]interface{} {
 		var reader io.Reader = r.stdRequest.Body
 		b, err := ioutil.ReadAll(reader)
 		if err != nil {
-			panic(err)
+			ralog.Error("rahttp: errors on reading request body: ", err)
+			return r.bodyParsed
 		}
 		var v interface{}
 		ralog.Debug("rahttp: body: ", string(b))
 		err = json.Unmarshal(b, &v)
 		if err != nil {
-			panic("Body should be a JSON object: " + err.Error())
+			ralog.Informational("rahttp: errors on unmarshalling body: ", err)
+			raerror.PanicWith(raerror.TypBadBody, 0, "Body should be a JSON object")
 		}
+
 		r.bodyParsed = formatJsonValue(v)
 
 	default:
-		r.stdRequest.ParseForm()
+		if err := r.stdRequest.ParseForm(); err != nil {
+			ralog.Informational("rahttp: errors on parsing form: ", err)
+			raerror.PanicWith(raerror.TypBadBody, 0, "Invalid body format")
+		}
+
 		r.bodyParsed = formatPostForm(r.stdRequest.PostForm)
 	}
 
@@ -112,8 +122,9 @@ func formatPostForm(postForm url.Values) map[string]interface{} {
 
 func formatJsonValue(v interface{}) map[string]interface{} {
 	m, ok := v.(map[string]interface{})
-	log.Println("rahttp: formatted json value: ", m, " assert result: ", ok)
+	ralog.Debug("rahttp: formatted json value: ", m, " assert result: ", ok)
 	if !ok {
+		ralog.Informational("rahttp: failed to format json value ", v)
 		return map[string]interface{}{}
 	}
 
