@@ -3,6 +3,9 @@ package validation
 import (
 	"errors"
 	"strings"
+
+	"github.com/raframework/rago/raerror"
+	"github.com/raframework/rago/ralog"
 )
 
 type validator struct {
@@ -58,6 +61,7 @@ func (v *validator) GetMessage() string {
 }
 
 func (v *validator) validate(attribute, rule string) bool {
+	ralog.Debug("validation: validate, attribute: ", attribute, " rule: ", rule)
 	rule, parameters := parseRule(rule)
 	value := v.getValue(attribute)
 
@@ -66,13 +70,29 @@ func (v *validator) validate(attribute, rule string) bool {
 	}
 
 	method, err := getRuleMethod(rule)
+	ralog.Debug("validation: method: ", method)
 	if err != nil {
-		panic(err)
+		e := "validation: rule " + rule + " not supported"
+		ralog.Critical(e)
+		raerror.PanicWith(raerror.TypInvalidArgument, 0, e)
 	}
 
 	// Call the rule method
 	if !method(attribute, value, parameters) {
-		v.message, _ = defaultMessages[rule]
+		message, _ := defaultMessages[rule]
+		if rule == "size" {
+			message = strings.Replace(message, ":size", parameters[0], -1)
+		} else if rule == "max" {
+			message = strings.Replace(message, ":max", parameters[0], -1)
+		} else if rule == "min" {
+			message = strings.Replace(message, ":min", parameters[0], -1)
+		} else if rule == "between" {
+			message = strings.Replace(message, ":min", parameters[0], -1)
+			message = strings.Replace(message, ":max", parameters[1], -1)
+		}
+		message = strings.Replace(message, ":attribute", attribute, -1)
+		v.message = message
+
 		return false
 	}
 
@@ -114,6 +134,10 @@ func parseParameters(rule, parameter string) []string {
 		parameters = append(parameters, parameter)
 	} else {
 		parameters = strings.Split(parameter, ",")
+	}
+
+	for key, value := range parameters {
+		parameters[key] = strings.TrimSpace(value)
 	}
 
 	return parameters

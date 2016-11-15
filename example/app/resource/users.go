@@ -20,8 +20,8 @@ func (u *Users) Create(request *rahttp.Request, response *rahttp.Response) {
 	queryParams := request.GetQueryParams()
 	parsedBody := request.GetParsedBody()
 	rules := map[string]interface{}{
-		"username": "required|email",
-		"password": "required",
+		"username": "required|string|email",
+		"password": "required|string",
 	}
 
 	log.Println("example: queryParams: ", queryParams)
@@ -52,7 +52,11 @@ func (u *Users) Update(request *rahttp.Request, response *rahttp.Response) {
 	queryParams := request.GetQueryParams()
 	parsedBody := request.GetParsedBody()
 	rules := map[string]interface{}{
-		"username": "required|email",
+		"username": "required|string|email",
+		"password": "string",
+		"age":      "float|min:1|max:100",
+		"score":    "float|between: 1, 100",
+		"size":     "size: 88",
 	}
 
 	log.Println("example: attributes: ", attributes)

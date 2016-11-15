@@ -35,8 +35,10 @@ func ErrorHandler(err interface{}, request *rahttp.Request, response *rahttp.Res
 		return
 	}
 
+	panic(err)
 	response.WithStatus(500)
 	response.Write(rsp.Json(errorResponse{code.InternalServerError, fmt.Sprint("Internal server error with: ", err), ""}))
+
 }
 
 func handleAppError(appError *apperror.AppError, request *rahttp.Request, response *rahttp.Response) {
