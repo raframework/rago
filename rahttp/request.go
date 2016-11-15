@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"strings"
 
 	"github.com/raframework/rago/raerror"
 	"github.com/raframework/rago/ralog"
@@ -17,11 +18,13 @@ type Request struct {
 	matchedUriPattern UriPattern
 	attributes        map[string]string
 	bodyParsed        map[string]interface{}
+	queryParams       map[string]interface{}
 }
 
 func NewRequest(stdRequest *http.Request) *Request {
 	return &Request{
 		stdRequest: stdRequest,
+		attributes: map[string]string{},
 	}
 }
 
@@ -55,7 +58,7 @@ func (r *Request) GetMediaType() string {
 		return ""
 	}
 	s := regexp.MustCompile("\\s*[;,]\\s*").Split(ct, 2)
-	mediaType := s[0]
+	mediaType := strings.ToLower(s[0])
 	ralog.Debug("rahttp: mediaType: ", mediaType)
 
 	return mediaType
@@ -97,13 +100,13 @@ func (r *Request) GetParsedBody() map[string]interface{} {
 			raerror.PanicWith(raerror.TypBadBody, 0, "Invalid body format")
 		}
 
-		r.bodyParsed = formatPostForm(r.stdRequest.PostForm)
+		r.bodyParsed = formatUrlValues(r.stdRequest.PostForm)
 	}
 
 	return r.bodyParsed
 }
 
-func formatPostForm(postForm url.Values) map[string]interface{} {
+func formatUrlValues(postForm url.Values) map[string]interface{} {
 	formatedForm := make(map[string]interface{})
 	if len(postForm) == 0 {
 		return formatedForm
@@ -131,10 +134,26 @@ func formatJsonValue(v interface{}) map[string]interface{} {
 	return m
 }
 
-func (r *Request) GetQueryParams() map[string]string {
-	return nil
+func (r *Request) GetQueryParams() map[string]interface{} {
+	if r.queryParams != nil {
+		return r.queryParams
+	}
+	r.queryParams = make(map[string]interface{})
+
+	ralog.Debug("rahttp: URL: ", r.stdRequest.URL)
+
+	if r.stdRequest.URL == nil {
+		return r.queryParams
+	}
+
+	values := r.stdRequest.URL.Query()
+	r.queryParams = formatUrlValues(values)
+
+	ralog.Debug("rahttp: query params: ", r.queryParams)
+
+	return r.queryParams
 }
 
 func (r *Request) GetAttributes() map[string]string {
-	return nil
+	return r.attributes
 }

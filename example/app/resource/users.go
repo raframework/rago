@@ -2,6 +2,7 @@ package resource
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/raframework/rago/example/app/config/code"
 	"github.com/raframework/rago/example/app/lib/apperror"
@@ -16,12 +17,14 @@ type Users struct {
 func (u *Users) Create(request *rahttp.Request, response *rahttp.Response) {
 	log.Println("example: Users.Create...")
 
+	queryParams := request.GetQueryParams()
 	parsedBody := request.GetParsedBody()
 	rules := map[string]interface{}{
 		"username": "required|email",
 		"password": "required",
 	}
 
+	log.Println("example: queryParams: ", queryParams)
 	log.Println("example: parsedBody: ", parsedBody)
 
 	validator := validation.New(parsedBody, rules)
@@ -44,6 +47,39 @@ func (u *Users) Create(request *rahttp.Request, response *rahttp.Response) {
 
 func (u *Users) Update(request *rahttp.Request, response *rahttp.Response) {
 	log.Println("example: Users.Update...")
+
+	attributes := request.GetAttributes()
+	queryParams := request.GetQueryParams()
+	parsedBody := request.GetParsedBody()
+	rules := map[string]interface{}{
+		"username": "required|email",
+	}
+
+	log.Println("example: attributes: ", attributes)
+	log.Println("example: queryParams: ", queryParams)
+	log.Println("example: parsedBody: ", parsedBody)
+
+	id, err := strconv.Atoi(attributes["id"])
+	if err != nil {
+		apperror.PanicWithMessage(apperror.BadRequest, code.ParamError, "Bad URL")
+	}
+
+	validator := validation.New(parsedBody, rules)
+	if validator.Fails() {
+		apperror.PanicWithMessage(apperror.BadRequest, code.ParamError, validator.GetMessage())
+	}
+
+	// TODO: do some updating steps
+
+	result := struct {
+		Id    int    `json:"id"`
+		Email string `json:"email"`
+	}{
+		id,
+		parsedBody["username"].(string),
+	}
+
+	response.WithStatus(200).Write(rsp.Json(result))
 }
 
 func (u *Users) Get(request *rahttp.Request, response *rahttp.Response) {
