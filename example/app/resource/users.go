@@ -52,7 +52,7 @@ func (u *Users) Update(request *rahttp.Request, response *rahttp.Response) {
 	queryParams := request.GetQueryParams()
 	parsedBody := request.GetParsedBody()
 	rules := map[string]interface{}{
-		"username": "required|string|email",
+		"username": "string|email",
 		"password": "string",
 		"age":      "float|min:1|max:100",
 		"score":    "float|between: 1, 100",
