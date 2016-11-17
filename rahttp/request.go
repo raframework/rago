@@ -64,6 +64,10 @@ func (r *Request) GetMediaType() string {
 	return mediaType
 }
 
+func (r *Request) GetHeader(key string) string {
+	return r.stdRequest.Header.Get(key)
+}
+
 func (r *Request) GetParsedBody() map[string]interface{} {
 	if r.bodyParsed != nil {
 		return r.bodyParsed

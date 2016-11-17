@@ -63,6 +63,8 @@ func (u *Users) Update(request *rahttp.Request, response *rahttp.Response) {
 	ralog.Debug("example: queryParams: ", queryParams)
 	ralog.Debug("example: parsedBody: ", parsedBody)
 
+	ralog.Debug("example: header: X-Test: ", request.GetHeader("X-Test"))
+
 	id, err := strconv.Atoi(attributes["id"])
 	if err != nil {
 		apperror.PanicWithMessage(apperror.BadRequest, code.ParamError, "Bad URL")
