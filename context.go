@@ -7,6 +7,12 @@ import (
 	"github.com/raframework/rago/ralog"
 )
 
+type ErrorHandler func(interface{}, *rahttp.Request, *rahttp.Response)
+
+type Processor interface {
+	Process(*rahttp.Request, *rahttp.Response)
+}
+
 type Context struct {
 	request      *rahttp.Request
 	response     *rahttp.Response
