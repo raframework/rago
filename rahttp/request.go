@@ -89,7 +89,7 @@ func (r *Request) GetParsedBody() map[string]interface{} {
 		err = json.Unmarshal(b, &v)
 		if err != nil {
 			ralog.Informational("rahttp: errors on unmarshalling body: ", err)
-			raerror.PanicWith(raerror.TypBadBody, 0, "Body should be a JSON object")
+			raerror.PanicWith(raerror.TypBadRequest, 0, "Body should be a JSON object")
 		}
 
 		r.bodyParsed = formatJsonValue(v)
@@ -97,7 +97,7 @@ func (r *Request) GetParsedBody() map[string]interface{} {
 	default:
 		if err := r.stdRequest.ParseForm(); err != nil {
 			ralog.Informational("rahttp: errors on parsing form: ", err)
-			raerror.PanicWith(raerror.TypBadBody, 0, "Invalid body format")
+			raerror.PanicWith(raerror.TypBadRequest, 0, "Invalid body format")
 		}
 
 		r.bodyParsed = formatUrlValues(r.stdRequest.PostForm)

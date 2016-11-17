@@ -56,7 +56,7 @@ func handleRaError(raError *raerror.RaError, request *rahttp.Request, response *
 		statusCode = 404
 		c = code.ResourceNotFound
 
-	case raerror.TypBadBody:
+	case raerror.TypBadRequest:
 		statusCode = 400
 		c = code.BadBody
 		message = raError.Message()
