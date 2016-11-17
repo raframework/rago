@@ -1,13 +1,13 @@
 package resource
 
 import (
-	"log"
 	"strconv"
 
 	"github.com/raframework/rago/example/app/config/code"
 	"github.com/raframework/rago/example/app/lib/apperror"
 	"github.com/raframework/rago/example/app/lib/rsp"
 	"github.com/raframework/rago/rahttp"
+	"github.com/raframework/rago/ralog"
 	"github.com/raframework/rago/validation"
 )
 
@@ -15,7 +15,7 @@ type Users struct {
 }
 
 func (u *Users) Create(request *rahttp.Request, response *rahttp.Response) {
-	log.Println("example: Users.Create...")
+	ralog.Debug("example: Users.Create...")
 
 	queryParams := request.GetQueryParams()
 	parsedBody := request.GetParsedBody()
@@ -24,8 +24,8 @@ func (u *Users) Create(request *rahttp.Request, response *rahttp.Response) {
 		"password": "required|string",
 	}
 
-	log.Println("example: queryParams: ", queryParams)
-	log.Println("example: parsedBody: ", parsedBody)
+	ralog.Debug("example: queryParams: ", queryParams)
+	ralog.Debug("example: parsedBody: ", parsedBody)
 
 	validator := validation.New(parsedBody, rules)
 	if validator.Fails() {
@@ -46,7 +46,7 @@ func (u *Users) Create(request *rahttp.Request, response *rahttp.Response) {
 }
 
 func (u *Users) Update(request *rahttp.Request, response *rahttp.Response) {
-	log.Println("example: Users.Update...")
+	ralog.Debug("example: Users.Update...")
 
 	attributes := request.GetAttributes()
 	queryParams := request.GetQueryParams()
@@ -59,9 +59,9 @@ func (u *Users) Update(request *rahttp.Request, response *rahttp.Response) {
 		"size":     "size: 88",
 	}
 
-	log.Println("example: attributes: ", attributes)
-	log.Println("example: queryParams: ", queryParams)
-	log.Println("example: parsedBody: ", parsedBody)
+	ralog.Debug("example: attributes: ", attributes)
+	ralog.Debug("example: queryParams: ", queryParams)
+	ralog.Debug("example: parsedBody: ", parsedBody)
 
 	id, err := strconv.Atoi(attributes["id"])
 	if err != nil {
@@ -87,13 +87,13 @@ func (u *Users) Update(request *rahttp.Request, response *rahttp.Response) {
 }
 
 func (u *Users) Get(request *rahttp.Request, response *rahttp.Response) {
-	log.Println("example: Users.Get...")
+	ralog.Debug("example: Users.Get...")
 }
 
 func (u *Users) Delete(request *rahttp.Request, response *rahttp.Response) {
-	log.Println("example: Users.Delete...")
+	ralog.Debug("example: Users.Delete...")
 }
 
 func (u *Users) List(request *rahttp.Request, response *rahttp.Response) {
-	log.Println("example: Users.List...")
+	ralog.Debug("example: Users.List...")
 }

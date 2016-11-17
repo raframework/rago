@@ -1,14 +1,13 @@
 package users
 
 import (
-	"log"
-
 	"github.com/raframework/rago/rahttp"
+	"github.com/raframework/rago/ralog"
 )
 
 type Password struct {
 }
 
 func (p *Password) Update(request *rahttp.Request, response *rahttp.Response) {
-	log.Println("example: Password.List...")
+	ralog.Debug("example: Password.List...")
 }
