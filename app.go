@@ -7,10 +7,6 @@ import (
 	"github.com/raframework/rago/ralog"
 )
 
-func init() {
-	ralog.SetLevel(ralog.LDebug)
-}
-
 type RequestHandler func(*Context)
 
 type app struct {

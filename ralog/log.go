@@ -2,11 +2,18 @@ package ralog
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
 var std = NewLogger(os.Stderr)
 
+// SetOutput sets the output destination for the default logger.
+func SetOutput(out io.Writer) {
+	std.WithOutput(out)
+}
+
+// SetOutput sets the log level for the default logger.
 func SetLevel(level LogLevel) {
 	std.WithLevel(level)
 }

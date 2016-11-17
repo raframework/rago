@@ -3,11 +3,12 @@ package ralog
 import (
 	"fmt"
 	"io"
+	"sync"
 	"time"
 )
 
-// Log levels in RFC5424
 const (
+	// Log levels in RFC5424
 	LEmergency     = 0
 	LAlert         = 1
 	LCritical      = 2
@@ -18,6 +19,8 @@ const (
 	LDebug         = 7
 
 	DefaultLevel = LInformational
+
+	DateFormat = "2006/01/02 15:04:05"
 )
 
 type LogLevel uint8
@@ -42,16 +45,19 @@ func (l LogLevel) String() string {
 	case LDebug:
 		return "Debug"
 	default:
-		panic(fmt.Sprintf("Rago: unhandled loglevel %d", l))
+		panic(fmt.Sprintf("ralog: unknown log level %d", l))
 	}
 }
 
 type Logger struct {
-	level LogLevel  // log level
-	out   io.Writer // destination for output
-	buf   []byte    // for accumulating text to write
+	mu    sync.Mutex // ensures atomic writes; protects the following fields
+	level LogLevel   // log level
+	out   io.Writer  // destination for output
+	buf   []byte     // for accumulating text to write
 }
 
+// NewLogger creates a new Logger. The out variable sets the
+// destination to which log data will be written.
 func NewLogger(out io.Writer) *Logger {
 	return &Logger{
 		level: DefaultLevel,
@@ -59,7 +65,17 @@ func NewLogger(out io.Writer) *Logger {
 	}
 }
 
+// WithOutput sets the output destination for the logger.
+func (l *Logger) WithOutput(w io.Writer) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.out = w
+}
+
+// WithLevel sets the log level for the logger.
 func (l *Logger) WithLevel(level LogLevel) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	l.level = level
 }
 
@@ -95,7 +111,14 @@ func (l *Logger) Debug(v ...interface{}) {
 	l.addRecord(LDebug, v...)
 }
 
-func (l *Logger) Output(s string) error {
+func (l *Logger) addRecord(level LogLevel, v ...interface{}) {
+	now := time.Now().Format(DateFormat)
+	if level <= l.level {
+		l.output(now + " [" + level.String() + "] " + fmt.Sprint(v...))
+	}
+}
+
+func (l *Logger) output(s string) error {
 	l.buf = []byte(s)
 	if len(s) == 0 || s[len(s)-1] != '\n' {
 		l.buf = append(l.buf, '\n')
@@ -103,11 +126,4 @@ func (l *Logger) Output(s string) error {
 	_, err := l.out.Write(l.buf)
 
 	return err
-}
-
-func (l *Logger) addRecord(level LogLevel, v ...interface{}) {
-	now := time.Now().Format("2006-01-02 15:04:05")
-	if level <= l.level {
-		l.Output(now + " [" + level.String() + "] " + fmt.Sprint(v...))
-	}
 }

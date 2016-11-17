@@ -12,11 +12,6 @@ import (
 	"github.com/raframework/rago/rahttp"
 )
 
-type errorResponse struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
 func ErrorHandler(err interface{}, request *rahttp.Request, response *rahttp.Response) {
 
 	log.Println("example: err type: ", reflect.ValueOf(err).Type().Kind())
@@ -36,21 +31,16 @@ func ErrorHandler(err interface{}, request *rahttp.Request, response *rahttp.Res
 
 	log.Println("example: error: ", err, "\nruntime stack:\n", getRuntimeStack())
 	response.WithStatus(500)
-	response.Write(rsp.Json(errorResponse{code.InternalServerError, code.Message(code.InternalServerError)}))
+	response.Write(rsp.ErrorJson(code.InternalServerError, ""))
 }
 
 func handleAppError(appError *apperror.AppError, request *rahttp.Request, response *rahttp.Response) {
 	statusCode := appError.Typ()
 	c := appError.Code()
-
-	var message string
-	message = appError.Message()
-	if message == "" {
-		message = code.Message(c)
-	}
+	message := appError.Message()
 
 	response.WithStatus(statusCode)
-	response.Write(rsp.Json(errorResponse{c, message}))
+	response.Write(rsp.ErrorJson(c, message))
 }
 
 func handleRaError(raError *raerror.RaError, request *rahttp.Request, response *rahttp.Response) {
@@ -81,14 +71,10 @@ func handleRaError(raError *raerror.RaError, request *rahttp.Request, response *
 		c = code.InternalServerError
 	}
 
-	if message == "" {
-		message = code.Message(c)
-	}
-
 	log.Println("example: error: ", raError)
 
 	response.WithStatus(statusCode)
-	response.Write(rsp.Json(errorResponse{c, message}))
+	response.Write(rsp.ErrorJson(c, message))
 }
 
 func getRuntimeStack() string {

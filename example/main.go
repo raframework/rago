@@ -5,7 +5,12 @@ import (
 	"github.com/raframework/rago/example/app/config/res"
 	"github.com/raframework/rago/example/app/lib/handler"
 	"github.com/raframework/rago/example/app/processor"
+	"github.com/raframework/rago/ralog"
 )
+
+func init() {
+	ralog.SetLevel(ralog.LDebug)
+}
 
 func main() {
 	app := rago.NewApp(res.UriPatterns)
