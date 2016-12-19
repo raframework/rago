@@ -4,18 +4,18 @@ import (
 	"reflect"
 	"runtime"
 
+	"github.com/coderd/glog"
 	"github.com/raframework/rago/example/app/config/code"
 	"github.com/raframework/rago/example/app/lib/apperror"
 	"github.com/raframework/rago/example/app/lib/rsp"
 	"github.com/raframework/rago/raerror"
 	"github.com/raframework/rago/rahttp"
-	"github.com/raframework/rago/ralog"
 )
 
 func ErrorHandler(err interface{}, request *rahttp.Request, response *rahttp.Response) {
 
-	ralog.Debug("example: err type: ", reflect.ValueOf(err).Type().Kind())
-	ralog.Debug("example: errorHandler with err: ", err)
+	glog.Debug("example: err type: ", reflect.ValueOf(err).Type().Kind())
+	glog.Debug("example: errorHandler with err: ", err)
 
 	appError, ok := err.(*apperror.AppError)
 	if ok {
@@ -29,7 +29,7 @@ func ErrorHandler(err interface{}, request *rahttp.Request, response *rahttp.Res
 		return
 	}
 
-	ralog.Debug("example: error: ", err, "\nruntime stack:\n", getRuntimeStack())
+	glog.Debug("example: error: ", err, "\nruntime stack:\n", getRuntimeStack())
 	response.WithStatus(500)
 	response.Write(rsp.ErrorJson(code.InternalServerError, ""))
 }
@@ -71,7 +71,7 @@ func handleRaError(raError *raerror.RaError, request *rahttp.Request, response *
 		c = code.InternalServerError
 	}
 
-	ralog.Debug("example: error: ", raError)
+	glog.Debug("example: error: ", raError)
 
 	response.WithStatus(statusCode)
 	response.Write(rsp.ErrorJson(c, message))

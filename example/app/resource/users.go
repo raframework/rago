@@ -3,19 +3,19 @@ package resource
 import (
 	"strconv"
 
+	"github.com/coderd/glog"
 	"github.com/raframework/rago/example/app/config/code"
 	"github.com/raframework/rago/example/app/lib/apperror"
 	"github.com/raframework/rago/example/app/lib/rsp"
 	"github.com/raframework/rago/rahttp"
-	"github.com/raframework/rago/ralog"
-	"github.com/raframework/rago/validation"
+	"github.com/ragopkg/validation"
 )
 
 type Users struct {
 }
 
 func (u *Users) Create(request *rahttp.Request, response *rahttp.Response) {
-	ralog.Debug("example: Users.Create...")
+	glog.Debug("example: Users.Create...")
 
 	queryParams := request.GetQueryParams()
 	parsedBody := request.GetParsedBody()
@@ -24,8 +24,8 @@ func (u *Users) Create(request *rahttp.Request, response *rahttp.Response) {
 		"password": "required|string",
 	}
 
-	ralog.Debug("example: queryParams: ", queryParams)
-	ralog.Debug("example: parsedBody: ", parsedBody)
+	glog.Debug("example: queryParams: ", queryParams)
+	glog.Debug("example: parsedBody: ", parsedBody)
 
 	validator := validation.New(parsedBody, rules)
 	if validator.Fails() {
@@ -46,7 +46,7 @@ func (u *Users) Create(request *rahttp.Request, response *rahttp.Response) {
 }
 
 func (u *Users) Update(request *rahttp.Request, response *rahttp.Response) {
-	ralog.Debug("example: Users.Update...")
+	glog.Debug("example: Users.Update...")
 
 	attributes := request.GetAttributes()
 	queryParams := request.GetQueryParams()
@@ -59,11 +59,11 @@ func (u *Users) Update(request *rahttp.Request, response *rahttp.Response) {
 		"size":     "size: 88",
 	}
 
-	ralog.Debug("example: attributes: ", attributes)
-	ralog.Debug("example: queryParams: ", queryParams)
-	ralog.Debug("example: parsedBody: ", parsedBody)
+	glog.Debug("example: attributes: ", attributes)
+	glog.Debug("example: queryParams: ", queryParams)
+	glog.Debug("example: parsedBody: ", parsedBody)
 
-	ralog.Debug("example: header: X-Test: ", request.GetHeader("X-Test"))
+	glog.Debug("example: header: X-Test: ", request.GetHeader("X-Test"))
 
 	id, err := strconv.Atoi(attributes["id"])
 	if err != nil {
@@ -89,13 +89,13 @@ func (u *Users) Update(request *rahttp.Request, response *rahttp.Response) {
 }
 
 func (u *Users) Get(request *rahttp.Request, response *rahttp.Response) {
-	ralog.Debug("example: Users.Get...")
+	glog.Debug("example: Users.Get...")
 }
 
 func (u *Users) Delete(request *rahttp.Request, response *rahttp.Response) {
-	ralog.Debug("example: Users.Delete...")
+	glog.Debug("example: Users.Delete...")
 }
 
 func (u *Users) List(request *rahttp.Request, response *rahttp.Response) {
-	ralog.Debug("example: Users.List...")
+	glog.Debug("example: Users.List...")
 }

@@ -1,15 +1,15 @@
 package main
 
 import (
+	"github.com/coderd/glog"
 	"github.com/raframework/rago"
 	"github.com/raframework/rago/example/app/config/res"
 	"github.com/raframework/rago/example/app/lib/handler"
 	"github.com/raframework/rago/example/app/processor"
-	"github.com/raframework/rago/ralog"
 )
 
 func init() {
-	ralog.SetLevel(ralog.LDebug)
+	glog.SetLevel(glog.LDebug)
 }
 
 func main() {

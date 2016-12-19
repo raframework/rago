@@ -3,8 +3,8 @@ package rago
 import (
 	"net/http"
 
+	"github.com/coderd/glog"
 	"github.com/raframework/rago/rahttp"
-	"github.com/raframework/rago/ralog"
 )
 
 type ErrorHandler func(interface{}, *rahttp.Request, *rahttp.Response)
@@ -22,7 +22,7 @@ type Context struct {
 }
 
 func NewContext(uriPatterns map[rahttp.UriPattern]rahttp.ResourceAndMethod, w http.ResponseWriter, req *http.Request) *Context {
-	ralog.Debug("rago: NewContext")
+	glog.Debug("rago: NewContext")
 
 	request := rahttp.NewRequest(req)
 	response := rahttp.NewResponse(w)
@@ -47,7 +47,7 @@ func (c *Context) MatchUriPattern() *Context {
 	}
 	defer c.recover()
 
-	ralog.Debug("rago: context.MatchUriPatter")
+	glog.Debug("rago: context.MatchUriPatter")
 
 	c.router.match()
 
@@ -60,7 +60,7 @@ func (c *Context) CallResourceAction() *Context {
 	}
 	defer c.recover()
 
-	ralog.Debug("rago: context.callResourceAction")
+	glog.Debug("rago: context.callResourceAction")
 
 	c.router.callResourceAction()
 
@@ -73,14 +73,14 @@ func (c *Context) Call(p Processor) *Context {
 	}
 	defer c.recover()
 
-	ralog.Debug("rago: context.Call")
+	glog.Debug("rago: context.Call")
 	p.Process(c.request, c.response)
 
 	return c
 }
 
 func (c *Context) Respond() *Context {
-	ralog.Debug("rago: context.Respond")
+	glog.Debug("rago: context.Respond")
 
 	c.response.FlushHeaders()
 	c.response.FlushStatus()
