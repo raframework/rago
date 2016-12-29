@@ -88,8 +88,8 @@ func (c *Context) handleError(err interface{}) {
 	c.err = err
 	if c.errorHandler != nil {
 		defer func() {
-			if err := recover(); err != nil {
-				c.defaultHandleError(err)
+			if e := recover(); e != nil {
+				c.defaultHandleError(e)
 			}
 		}()
 
