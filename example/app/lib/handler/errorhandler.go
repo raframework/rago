@@ -1,10 +1,9 @@
 package handler
 
 import (
-	"reflect"
+	"log"
 	"runtime"
 
-	"github.com/coderd/glog"
 	"github.com/raframework/rago/example/app/config/code"
 	"github.com/raframework/rago/example/app/lib/apperror"
 	"github.com/raframework/rago/example/app/lib/rsp"
@@ -13,10 +12,6 @@ import (
 )
 
 func ErrorHandler(err interface{}, request *rahttp.Request, response *rahttp.Response) {
-
-	glog.Debug("example: err type: ", reflect.ValueOf(err).Type().Kind())
-	glog.Debug("example: errorHandler with err: ", err)
-
 	appError, ok := err.(*apperror.AppError)
 	if ok {
 		handleAppError(appError, request, response)
@@ -29,7 +24,7 @@ func ErrorHandler(err interface{}, request *rahttp.Request, response *rahttp.Res
 		return
 	}
 
-	glog.Debug("example: error: ", err, "\nruntime stack:\n", getRuntimeStack())
+	log.Println("example: error: ", err, "\nruntime stack:\n", getRuntimeStack())
 	response.WithStatus(500)
 	response.Write(rsp.ErrorJson(code.InternalServerError, ""))
 }
@@ -71,7 +66,7 @@ func handleRaError(raError *raerror.RaError, request *rahttp.Request, response *
 		c = code.InternalServerError
 	}
 
-	glog.Debug("example: error: ", raError)
+	log.Println("example: error: ", raError)
 
 	response.WithStatus(statusCode)
 	response.Write(rsp.ErrorJson(c, message))

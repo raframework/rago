@@ -9,7 +9,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/coderd/glog"
 	"github.com/raframework/rago/raerror"
 )
 
@@ -30,7 +29,6 @@ func NewRequest(stdRequest *http.Request) *Request {
 
 func (r *Request) GetUriPath() string {
 	path := r.stdRequest.URL.Path
-	glog.Debug("rahttp: uri path ", path)
 
 	return path
 }
@@ -53,13 +51,11 @@ func (r *Request) GetContentType() string {
 
 func (r *Request) GetMediaType() string {
 	ct := r.GetContentType()
-	glog.Debug("rahttp: Content-Type: ", ct)
 	if ct == "" {
 		return ""
 	}
 	s := regexp.MustCompile("\\s*[;,]\\s*").Split(ct, 2)
 	mediaType := strings.ToLower(s[0])
-	glog.Debug("rahttp: mediaType: ", mediaType)
 
 	return mediaType
 }
@@ -85,14 +81,11 @@ func (r *Request) GetParsedBody() map[string]interface{} {
 		var reader io.Reader = r.stdRequest.Body
 		b, err := ioutil.ReadAll(reader)
 		if err != nil {
-			glog.Error("rahttp: errors on reading request body: ", err)
 			return r.bodyParsed
 		}
 		var v interface{}
-		glog.Debug("rahttp: body: ", string(b))
 		err = json.Unmarshal(b, &v)
 		if err != nil {
-			glog.Informational("rahttp: errors on unmarshalling body: ", err)
 			raerror.PanicWith(raerror.TypBadRequest, 0, "Body should be a JSON object")
 		}
 
@@ -100,7 +93,6 @@ func (r *Request) GetParsedBody() map[string]interface{} {
 
 	default:
 		if err := r.stdRequest.ParseForm(); err != nil {
-			glog.Informational("rahttp: errors on parsing form: ", err)
 			raerror.PanicWith(raerror.TypBadRequest, 0, "Invalid body format")
 		}
 
@@ -129,9 +121,7 @@ func formatUrlValues(postForm url.Values) map[string]interface{} {
 
 func formatJsonValue(v interface{}) map[string]interface{} {
 	m, ok := v.(map[string]interface{})
-	glog.Debug("rahttp: formatted json value: ", m, " assert result: ", ok)
 	if !ok {
-		glog.Informational("rahttp: failed to format json value ", v)
 		return map[string]interface{}{}
 	}
 
@@ -144,16 +134,12 @@ func (r *Request) GetQueryParams() map[string]interface{} {
 	}
 	r.queryParams = make(map[string]interface{})
 
-	glog.Debug("rahttp: URL: ", r.stdRequest.URL)
-
 	if r.stdRequest.URL == nil {
 		return r.queryParams
 	}
 
 	values := r.stdRequest.URL.Query()
 	r.queryParams = formatUrlValues(values)
-
-	glog.Debug("rahttp: query params: ", r.queryParams)
 
 	return r.queryParams
 }

@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/coderd/glog"
 	"github.com/raframework/rago/raerror"
 	"github.com/raframework/rago/rahttp"
 )
@@ -26,8 +25,6 @@ type router struct {
 }
 
 func newRouter(request *rahttp.Request, response *rahttp.Response, uriPatterns map[rahttp.UriPattern]rahttp.ResourceAndMethod) *router {
-	glog.Debug("rago: NewRouter")
-
 	return &router{
 		request:     request,
 		response:    response,
@@ -39,18 +36,14 @@ func (r *router) match() {
 	path := strings.TrimSpace(r.request.GetUriPath())
 
 	pathSegments := strings.Split(strings.Trim(path, "/"), "/")
-	glog.Debug("rago: pathSegments ", pathSegments)
 	pathSegmentCount := len(pathSegments)
-	glog.Debug("rago: pathSegmentCount ", pathSegmentCount)
 
 	args := make(map[string]string)
 
 	matched := false
 	for pattern, resourceAndMethod := range r.uriPatterns {
 		patternSegments := strings.Split(strings.Trim(string(pattern), "/"), "/")
-		glog.Debug("rago: patternSegments ", patternSegments)
 		patternSegmentCount := len(patternSegments)
-		glog.Debug("rago: patternSegmentCount ", patternSegmentCount)
 		if patternSegmentCount != pathSegmentCount {
 			continue
 		}
@@ -69,13 +62,11 @@ func (r *router) match() {
 			r.request.WithMatchedUriPattern(pattern)
 			r.request.WithAttributes(args)
 			method := r.request.GetMethod()
-			glog.Debug("rago: method ", method)
 			if !isMethodSupported(method, resourceAndMethod.Methods) {
 				raerror.PanicWith(raerror.TypMethodNotAllowed, 0, "rago: unsupported method "+string(method))
 			}
 
 			lastSegmentIsAttribute := patternSegments[patternSegmentCount-1][0] == ':'
-			glog.Debug("rago: lastSegmentIsAttribute ", lastSegmentIsAttribute)
 			r.withResourceAction(resourceAndMethod.ResourceObj, method, lastSegmentIsAttribute)
 			break
 		}
@@ -84,8 +75,6 @@ func (r *router) match() {
 	if !matched {
 		raerror.PanicWith(raerror.TypNotFound, 0, "rago: resource not found")
 	}
-
-	glog.Debug("rago: router.match")
 }
 
 func (r *router) withResourceAction(resourceObj interface{}, method rahttp.Method, lastSegmentIsAttribute bool) {
@@ -101,14 +90,11 @@ func (r *router) withResourceAction(resourceObj interface{}, method rahttp.Metho
 	if action == emtpyValue {
 		raerror.PanicWith(raerror.TypRuntime, 0, "rago: resource action '"+actionName+"' not found")
 	}
-	glog.Debug("rago: action ", action)
 
 	r.resourceAction = action
 }
 
 func (r *router) callResourceAction() {
-	glog.Debug("rago: router.callResourceAction")
-
 	r.resourceAction.Call([]reflect.Value{reflect.ValueOf(r.request), reflect.ValueOf(r.response)})
 }
 

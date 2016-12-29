@@ -3,7 +3,6 @@ package rago
 import (
 	"net/http"
 
-	"github.com/coderd/glog"
 	"github.com/raframework/rago/rahttp"
 )
 
@@ -22,8 +21,6 @@ type Context struct {
 }
 
 func NewContext(uriPatterns map[rahttp.UriPattern]rahttp.ResourceAndMethod, w http.ResponseWriter, req *http.Request) *Context {
-	glog.Debug("rago: NewContext")
-
 	request := rahttp.NewRequest(req)
 	response := rahttp.NewResponse(w)
 
@@ -47,8 +44,6 @@ func (c *Context) MatchUriPattern() *Context {
 	}
 	defer c.recover()
 
-	glog.Debug("rago: context.MatchUriPatter")
-
 	c.router.match()
 
 	return c
@@ -59,8 +54,6 @@ func (c *Context) CallResourceAction() *Context {
 		return c
 	}
 	defer c.recover()
-
-	glog.Debug("rago: context.callResourceAction")
 
 	c.router.callResourceAction()
 
@@ -73,15 +66,12 @@ func (c *Context) Call(p Processor) *Context {
 	}
 	defer c.recover()
 
-	glog.Debug("rago: context.Call")
 	p.Process(c.request, c.response)
 
 	return c
 }
 
 func (c *Context) Respond() *Context {
-	glog.Debug("rago: context.Respond")
-
 	c.response.FlushHeaders()
 	c.response.FlushStatus()
 	c.response.FlushBody()
