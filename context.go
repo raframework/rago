@@ -119,7 +119,7 @@ func (c *Context) defaultHandleError(err interface{}) {
 	}
 
 	if statusCode == 500 {
-		log.Println("rago: ", err)
+		log.Println("rago:", err)
 	}
 
 	c.response.WithStatus(statusCode)
