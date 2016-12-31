@@ -73,9 +73,7 @@ func (c *Context) Call(p Processor) *Context {
 }
 
 func (c *Context) Respond() *Context {
-	c.response.FlushHeaders()
-	c.response.FlushStatus()
-	c.response.FlushBody()
+	c.response.Flush()
 
 	return c
 }
@@ -121,7 +119,7 @@ func (c *Context) defaultHandleError(err interface{}) {
 	}
 
 	if statusCode == 500 {
-		log.Println("[Error] rago: ", err)
+		log.Println("rago: ", err)
 	}
 
 	c.response.WithStatus(statusCode)

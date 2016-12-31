@@ -85,6 +85,7 @@ func NewResponse(stdResponseWriter http.ResponseWriter) *Response {
 	return &Response{
 		stdResponseWriter: stdResponseWriter,
 		protoclVersion:    "1.1",
+		status:            200,
 		headers:           map[string]string{},
 	}
 }
@@ -103,7 +104,7 @@ func (r *Response) WithStatus(code int) *Response {
 
 	reasonPhrase, ok := messages[code]
 	if !ok {
-		panic("Invalid status code: " + string(code))
+		panic("rahttp: invalid status code: " + string(code))
 	}
 
 	r.reasonPhrase = reasonPhrase
@@ -127,23 +128,19 @@ func (r *Response) GetHeaders() map[string]string {
 	return r.headers
 }
 
-func (r *Response) FlushStatus() {
+func (r *Response) Flush() {
 	r.stdResponseWriter.WriteHeader(r.status)
-}
 
-func (r *Response) FlushHeaders() {
 	for name, value := range r.headers {
 		r.stdResponseWriter.Header().Set(name, value)
 	}
-}
 
-func (r *Response) FlushBody() {
 	r.stdResponseWriter.Write([]byte(r.body))
 }
 
 func filterStatus(status int) int {
 	if status < 100 || status > 599 {
-		panic("Invalid HTTP status code")
+		panic("rahttp: invalid HTTP status code")
 	}
 
 	return status
