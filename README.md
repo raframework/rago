@@ -59,8 +59,14 @@ Rago is a RESTful API framework for the Go language.
 
 		// Request handler handles the incoming request.
 		requestHandler := func(c *rago.Context) {
+			// Match the route, and set the resource's action correctly.
 			c.MatchUriPattern()
+
+			// Call the resouce's action.
+			// You should call MatchUriPattern() before this.
 			c.CallResourceAction()
+
+			// Send the response to the client.
 			c.Respond()
 		}
 		app.WithRequestHandler(requestHandler)
