@@ -2,7 +2,7 @@
 
 Rago is a RESTful API framework for the Go language. 
 
-## Get Started
+## Getting Started
 
 1. Download and install it:
 
@@ -23,7 +23,7 @@ Rago is a RESTful API framework for the Go language.
 3. Example:
 
     ```bash
-    $ cat test.go
+    $ vim test.go
     ```
 
     ```go
@@ -63,9 +63,10 @@ Rago is a RESTful API framework for the Go language.
 			c.CallResourceAction()
 			c.Respond()
 		}
+		app.WithRequestHanlder(requestHandler)
 
 		// Serves on :8800
-		app.WithRequestHanlder(requestHandler).Run(":8800")
+		app.Run(":8800")
 	}
     ```
 
