@@ -30,7 +30,7 @@ func New(typ int, code int, message string) error {
 }
 
 func (ae *AppError) Error() string {
-	return fmt.Sprintf("apperror type: %d, code: %d", ae.typ, ae.code)
+	return fmt.Sprintf("apperror: type(%d) code(%d) message(%s)", ae.typ, ae.code, ae.message)
 }
 
 func (ae *AppError) Typ() int {
