@@ -24,7 +24,7 @@ func ErrorHandler(err interface{}, request *rahttp.Request, response *rahttp.Res
 		return
 	}
 
-	log.Println("example: error: ", err, "\nruntime stack:\n", getRuntimeStack())
+	log.Println("example:", err, "\nruntime stack:\n", getRuntimeStack())
 	response.WithStatus(500)
 	response.Write(rsp.ErrorJson(code.InternalServerError, ""))
 }
@@ -66,7 +66,7 @@ func handleRaError(raError *raerror.RaError, request *rahttp.Request, response *
 		c = code.InternalServerError
 	}
 
-	log.Println("example: error: ", raError)
+	log.Println("example:", raError)
 
 	response.WithStatus(statusCode)
 	response.Write(rsp.ErrorJson(c, message))

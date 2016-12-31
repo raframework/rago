@@ -63,7 +63,7 @@ Rago is a RESTful API framework for the Go language.
 			c.CallResourceAction()
 			c.Respond()
 		}
-		app.WithRequestHanlder(requestHandler)
+		app.WithRequestHandler(requestHandler)
 
 		// Serves on :8800
 		app.Run(":8800")

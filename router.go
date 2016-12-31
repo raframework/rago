@@ -17,6 +17,8 @@ var methodActionMap = map[rahttp.Method]string{
 	rahttp.METHOD_DELETE: "Delete",
 }
 
+var emptyAction = reflect.Value{}
+
 type router struct {
 	request        *rahttp.Request
 	response       *rahttp.Response
@@ -95,6 +97,10 @@ func (r *router) withResourceAction(resourceObj interface{}, method rahttp.Metho
 }
 
 func (r *router) callResourceAction() {
+	if r.resourceAction == emptyAction {
+		panic("rago: you should provide the 'resourceAction' by calling Context.MatchUriPattern() before Context.CallResourceAction().")
+	}
+
 	r.resourceAction.Call([]reflect.Value{reflect.ValueOf(r.request), reflect.ValueOf(r.response)})
 }
 

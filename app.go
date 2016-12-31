@@ -25,12 +25,16 @@ func (a *app) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	a.requestHandler(context)
 }
 
-func (a *app) WithRequestHanlder(requestHandler RequestHandler) *app {
+func (a *app) WithRequestHandler(requestHandler RequestHandler) *app {
 	a.requestHandler = requestHandler
 
 	return a
 }
 
 func (a *app) Run(address string) {
+	if a.requestHandler == nil {
+		panic("rago: you should provide the 'requestHandler' by calling app.WithRequestHandler() before app.Run().")
+	}
+
 	panic(http.ListenAndServe(address, a))
 }

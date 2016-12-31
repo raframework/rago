@@ -17,6 +17,7 @@ func main() {
 		c.CallResourceAction()
 		c.Respond()
 	}
+	app.WithRequestHandler(requestHandler)
 
-	app.WithRequestHanlder(requestHandler).Run(":8800")
+	app.Run(":8800")
 }
