@@ -1,6 +1,6 @@
-# Rago
+# rago
 
-Rago is a RESTful API framework for the Go language. 
+A RESTful API framework for the Go language. 
 
 ## Getting Started
 
