@@ -72,6 +72,18 @@ func (c *Context) Call(p Processor) *Context {
 	return c
 }
 
+func (c *Context) CallIgnoreError(p Processor) *Context {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("rago: error caught in Context.CallIgnoreError():", err)
+		}
+	}()
+
+	p.Process(c.request, c.response)
+
+	return c
+}
+
 func (c *Context) Respond() *Context {
 	c.response.Flush()
 
