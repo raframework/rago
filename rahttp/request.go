@@ -16,6 +16,7 @@ type Request struct {
 	stdRequest        *http.Request
 	matchedUriPattern UriPattern
 	attributes        map[string]string
+	body              []byte
 	bodyParsed        map[string]interface{}
 	queryParams       map[string]interface{}
 }
@@ -27,10 +28,14 @@ func NewRequest(stdRequest *http.Request) *Request {
 	}
 }
 
-func (r *Request) GetUriPath() string {
+func (r *Request) GetUrlPath() string {
 	path := r.stdRequest.URL.Path
 
 	return path
+}
+
+func (r *Request) GetRequestUri() string {
+	return r.stdRequest.RequestURI
 }
 
 func (r *Request) WithMatchedUriPattern(pattern UriPattern) {
@@ -64,6 +69,22 @@ func (r *Request) GetHeader(key string) string {
 	return r.stdRequest.Header.Get(key)
 }
 
+func (r *Request) GetBody() []byte {
+	if r.body != nil {
+		return r.body
+	}
+
+	var reader io.Reader = r.stdRequest.Body
+	b, err := ioutil.ReadAll(reader)
+	if err != nil {
+		r.body = []byte{}
+	} else {
+		r.body = b
+	}
+
+	return r.body
+}
+
 func (r *Request) GetParsedBody() map[string]interface{} {
 	if r.bodyParsed != nil {
 		return r.bodyParsed
@@ -75,14 +96,15 @@ func (r *Request) GetParsedBody() map[string]interface{} {
 		return r.bodyParsed
 	}
 
+	var err error
 	mt := r.GetMediaType()
 	switch {
 	case mt == "application/json":
-		var reader io.Reader = r.stdRequest.Body
-		b, err := ioutil.ReadAll(reader)
-		if err != nil {
+		b := r.GetBody()
+		if len(b) == 0 {
 			return r.bodyParsed
 		}
+
 		var v interface{}
 		err = json.Unmarshal(b, &v)
 		if err != nil {
@@ -92,7 +114,7 @@ func (r *Request) GetParsedBody() map[string]interface{} {
 		r.bodyParsed = formatJsonValue(v)
 
 	default:
-		if err := r.stdRequest.ParseForm(); err != nil {
+		if err = r.stdRequest.ParseForm(); err != nil {
 			raerror.PanicWith(raerror.TypBadRequest, 0, "rahttp: invalid body format")
 		}
 

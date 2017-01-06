@@ -128,6 +128,10 @@ func (r *Response) GetHeaders() map[string]string {
 	return r.headers
 }
 
+func (r *Response) GetBody() string {
+	return r.body
+}
+
 func (r *Response) Flush() {
 	r.stdResponseWriter.WriteHeader(r.status)
 

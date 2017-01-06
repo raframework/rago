@@ -35,7 +35,7 @@ func newRouter(request *rahttp.Request, response *rahttp.Response, uriPatterns m
 }
 
 func (r *router) match() {
-	path := strings.TrimSpace(r.request.GetUriPath())
+	path := strings.TrimSpace(r.request.GetUrlPath())
 
 	pathSegments := strings.Split(strings.Trim(path, "/"), "/")
 	pathSegmentCount := len(pathSegments)
